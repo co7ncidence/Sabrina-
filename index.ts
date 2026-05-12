@@ -18,14 +18,11 @@ const client = new Client({
   GatewayIntentBits.MessageContent
 ]
 });
-
 client.once("ready", () => {
   console.log(`Logged in as ${client.user?.tag}`);
 });
 client.on("messageCreate", async (message) => {
-  if (message.author.bot) client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
-
   try {
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -62,6 +59,5 @@ client.on("messageCreate", async (message) => {
     message.reply("Something broke.");
   }
 });
-  }
-});
+
 client.login(process.env.DISCORD_TOKEN);

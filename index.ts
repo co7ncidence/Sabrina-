@@ -36,7 +36,7 @@ client.on("messageCreate", async (message) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "openai/gpt-oss-20b:free",
+          model: "meta-llama/llama-3.1-8b-instruct:free",
           messages: [
             {
               role: "system",

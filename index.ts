@@ -50,7 +50,6 @@ client.on("messageCreate", async (message) => {
 
     const data = await response.json();
 
-console.log(JSON.stringify(data, null, 2));
     
     const reply = data.choices?.[0]?.message?.content;
 
@@ -61,7 +60,6 @@ if (!reply) {
 
 await message.reply(reply);
 
-    message.reply(reply);
   } catch (err) {
     console.error(err);
     message.reply("Something broke.");

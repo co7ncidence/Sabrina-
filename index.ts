@@ -21,15 +21,18 @@ const client = new Client({
 client.once("ready", () => {
   console.log(`Logged in as ${client.user?.tag}`);
 });
+client.removeAllListeners("messageCreate");
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+  if (message.author.id === client.user?.id) return;
+
   try {
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -37,7 +40,8 @@ client.on("messageCreate", async (message) => {
           messages: [
             {
               role: "system",
-              content: "You are Sabrina Carpenter. Be witty, chaotic, funny, and conversational."
+              content:
+                "You are Sabrina Carpenter. Be witty, chaotic, funny, and conversational."
             },
             {
               role: "user",
@@ -50,19 +54,17 @@ client.on("messageCreate", async (message) => {
 
     const data = await response.json();
 
-    
     const reply = data.choices?.[0]?.message?.content;
 
-if (!reply) {
-  console.log(data);
-  return;
-}
+    if (!reply) {
+      console.log(data);
+      return;
+    }
 
-await message.reply(reply);
-
+    await message.reply(reply);
   } catch (err) {
     console.error(err);
-    message.reply("Something broke.");
+    await message.reply("Something broke.");
   }
 });
 

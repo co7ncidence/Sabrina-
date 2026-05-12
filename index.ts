@@ -77,7 +77,7 @@ If someone insults you first:
 - don't use hateful slurs
 
 Talk naturally like a chronically online friend in a Discord VC.
-`."
+`
             },
             {
               role: "user",

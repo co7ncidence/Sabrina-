@@ -51,7 +51,9 @@ client.on("messageCreate", async (message) => {
     const data = await response.json();
 
     const reply =
-      data.choices?.[0]?.message?.content || "I have nothing to say.";
+  data.choices?.[0]?.message?.content ||
+  data.choices?.[0]?.text ||
+  "I have nothing to say.";
 
     message.reply(reply);
   } catch (err) {

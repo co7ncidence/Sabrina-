@@ -28,7 +28,7 @@ client.on("messageCreate", async (message) => {
 
   try {
     const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+      model: "openai/gpt-oss-20b:free",
       {
         method: "POST",
         headers: {
@@ -97,8 +97,7 @@ Use natural lowercase typing often.
     );
 
     const data = await response.json();
-console.log(JSON.stringify(data, null, 2));
-    const reply = data.choices?.[0]?.message?.content;
+ const reply = data.choices?.[0]?.message?.content;
 
     if (!reply) {
       console.log(data);

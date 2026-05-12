@@ -12,7 +12,11 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.MessageContent
+]
 });
 
 client.once("ready", () => {

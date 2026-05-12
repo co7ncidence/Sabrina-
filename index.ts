@@ -24,7 +24,6 @@ client.once("ready", () => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   try {
-   console.log(process.env.OPENROUTER_API_KEY);
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -53,10 +52,14 @@ client.on("messageCreate", async (message) => {
 
 console.log(JSON.stringify(data, null, 2));
     
-    const reply =
-  data.choices?.[0]?.message?.content ||
-  data.choices?.[0]?.text ||
-  "I have nothing to say.";
+    const reply = data.choices?.[0]?.message?.content;
+
+if (!reply) {
+  console.log(data);
+  return;
+}
+
+await message.reply(reply);
 
     message.reply(reply);
   } catch (err) {

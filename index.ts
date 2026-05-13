@@ -35,6 +35,27 @@ if (content === "!coinflip") {
   return;
 }
 
+```ts
+if (content.startsWith("!blacktea lives")) {
+  const args = content.split(" ");
+  const lives = Number(args[2]);
+
+  if (isNaN(lives) || lives < 1 || lives > 5) {
+    await message.reply(
+      "choose between 1 and 5 lives"
+    );
+    return;
+  }
+
+  maxLives = lives;
+
+  await message.reply(
+    blacktea lives set to ${lives}
+  );
+
+  return;
+}
+
 if (content === "!blacktea") {
   const combos = [
     "ple",
@@ -46,9 +67,6 @@ if (content === "!blacktea") {
     "mon",
     "ack"
   ];
-
-  const combo =
-    combos[Math.floor(Math.random() * combos.length)];
 
   const hearts = (filled) => {
     let result = "";
@@ -99,11 +117,27 @@ if (content === "!blacktea") {
       }
 
       players.forEach((player) => {
-        activeGames.set(player.id, combo);
+        const combo =
+          combos[Math.floor(Math.random() * combos.length)];
+
+        activeGames.set(player.id, {
+          combo,
+          lives: maxLives
+        });
+      });
+
+      const firstCombo =
+        combos[Math.floor(Math.random() * combos.length)];
+
+      players.forEach((player) => {
+        activeGames.set(player.id, {
+          combo: firstCombo,
+          lives: maxLives
+        });
       });
 
       await lobbyMessage.edit(
-        `blacktea started\nword must contain: **${combo}**`
+        `blacktea started\nword must contain: ${firstCombo}\n10s left`
       );
     }
   }, 1000);
@@ -111,15 +145,28 @@ if (content === "!blacktea") {
   return;
 }
 
-const activeCombo = activeGames.get(message.author.id);
+const activeGame = activeGames.get(message.author.id);
 
-if (activeCombo) {
-  const word = message.content.toLowerCase();
+if (activeGame) {
+  const word = content;
 
-  if (!word.includes(activeCombo)) {
+  if (!word.includes(activeGame.combo)) {
+    activeGame.lives--;
+
+    if (activeGame.lives <= 0) {
+      activeGames.delete(message.author.id);
+
+      await message.reply(
+        `wrong word\n🖤🖤🖤\n${message.author.username} is out`
+      );
+
+      return;
+    }
+
     await message.reply(
-      `invalid word — it must contain "${activeCombo}"`
+      `wrong word\nlives left: ${"♥️".repeat(activeGame.lives)}`
     );
+
     return;
   }
 
@@ -129,15 +176,79 @@ if (activeCombo) {
     );
 
     if (!res.ok) {
-      await message.reply("that is not a real word");
+      activeGame.lives--;
+
+      if (activeGame.lives <= 0) {
+        activeGames.delete(message.author.id);
+
+        await message.reply(
+          `${word} is not real\n${message.author.username} is out`
+        );
+
+        return;
+      }
+
+      await message.reply(
+        `${word} is not real\nlives left: ${"♥️".repeat(activeGame.lives)}`
+      );
+
       return;
     }
 
-    activeGames.delete(message.author.id);
+    const combos = [
+      "ple",
+      "str",
+      "cha",
+      "ing",
+      "ous",
+      "ter",
+      "mon",
+      "ack"
+    ];
 
-    await message.reply(
-      `${word} is valid. you win`
+    const newCombo =
+      combos[Math.floor(Math.random() * combos.length)];
+
+    activeGame.combo = newCombo;
+
+    let timer = 10;
+
+    const timerMessage = await message.reply(
+      `${word} is valid\nnext word: ${newCombo}\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
     );
+
+    const turnTimer = setInterval(async () => {
+      timer--;
+
+      if (!activeGames.has(message.author.id)) {
+        clearInterval(turnTimer);
+        return;
+      }
+
+      await timerMessage.edit(
+        `${word} is valid\nnext word: ${newCombo}\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+      );
+
+      if (timer <= 0) {
+        clearInterval(turnTimer);
+
+        activeGame.lives--;
+
+        if (activeGame.lives <= 0) {
+          activeGames.delete(message.author.id);
+
+          await timerMessage.edit(
+            `${message.author.username} ran out of time and is out`
+          );
+
+          return;
+        }
+
+        await timerMessage.edit(
+          `time ran out\nlives: ${"♥️".repeat(activeGame.lives)}`
+        );
+      }
+    }, 1000);
   } catch {
     await message.reply("dictionary check failed");
   }
@@ -147,7 +258,7 @@ if (activeCombo) {
 
 if (content.startsWith("!")) return;
 
-try {
+try
   const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {

@@ -184,7 +184,19 @@ const firstRoundTimer = setInterval(async () => {
 
   }
 
-}, 1000);      
+}, 1000);
+ });
+
+  }
+
+}, 1000);
+
+    }
+
+  }, 1000);
+
+  return;
+}
   return;
 }
 

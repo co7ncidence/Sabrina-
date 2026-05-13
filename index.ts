@@ -36,7 +36,7 @@ if (content === "!coinflip") {
 }
 
 
-```ts
+ts
 if (content.startsWith("!blacktea lives")) {
   const args = content.split(" ");
   const lives = Number(args[2]);
@@ -177,7 +177,6 @@ if (content === "!blacktea") {
 
   return;
 }
-``
 
 const activeGame = activeGames.get(message.author.id);
 

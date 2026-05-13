@@ -36,7 +36,6 @@ if (content === "!coinflip") {
 }
 
 
-ts
 if (content.startsWith("!blacktea lives")) {
   const args = content.split(" ");
   const lives = Number(args[2]);
@@ -51,7 +50,7 @@ if (content.startsWith("!blacktea lives")) {
   maxLives = lives;
 
   await message.reply(
-    blacktea lives set to ${lives}
+    `blacktea lives set to ${lives}`
   );
 
   return;

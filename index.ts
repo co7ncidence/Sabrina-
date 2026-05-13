@@ -25,7 +25,12 @@ client.removeAllListeners("messageCreate");
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
+if (message.content === "!coinflip") {
+  const result = Math.random() < 0.5 ? "heads" : "tails";
 
+  await message.reply(`you got ${result}`);
+  return;
+}
   try {
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",

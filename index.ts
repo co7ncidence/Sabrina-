@@ -2,6 +2,7 @@ import express from "express";
 import { Client, GatewayIntentBits } from "discord.js";
 const app = express();
 const activeGames = new Map();
+let maxLives = 3;
 
 app.get("/", (_, res) => {
   res.send("Bot is running");
@@ -101,8 +102,10 @@ if (content === "!blacktea") {
       `blacktea starting in ${seconds} seconds\nreact with 🖤 to join\n\n${hearts(seconds)}`
     );
 
-    if (seconds <= 0) {
-      clearInterval(countdown);
+  if (seconds <= 0) {
+  if (seconds < 0) return;
+
+  clearInterval(countdown);
 
       const reaction =
         lobbyMessage.reactions.cache.get("🖤");
@@ -111,9 +114,9 @@ if (content === "!blacktea") {
         ? await reaction.users.fetch()
         : null;
 
-      const players = users
-        ? users.filter((u) => !u.bot)
-        : [];
+     const players = users
+  ? users.filter((u) => !u.bot)
+  : null;
 
       if (!players || players.size === 0) {
         await lobbyMessage.edit(

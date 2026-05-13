@@ -35,7 +35,7 @@ if (content === "!coinflip") {
   return;
 }
 
-```ts
+
 if (content.startsWith("!blacktea lives")) {
   const args = content.split(" ");
   const lives = Number(args[2]);
@@ -50,7 +50,7 @@ if (content.startsWith("!blacktea lives")) {
   maxLives = lives;
 
   await message.reply(
-    blacktea lives set to ${lives}
+    `blacktea lives set to ${lives}`
   );
 
   return;
@@ -58,14 +58,18 @@ if (content.startsWith("!blacktea lives")) {
 
 if (content === "!blacktea") {
   const combos = [
-    "ple",
-    "str",
-    "cha",
-    "ing",
-    "ous",
-    "ter",
-    "mon",
-    "ack"
+    "ple", "str", "cha", "ing", "ous",
+    "ter", "mon", "ack", "ash", "ice",
+    "ace", "ake", "all", "ame", "and",
+    "ant", "any", "ard", "art", "ate",
+    "ear", "ell", "est", "ick", "ide",
+    "ight", "ill", "ime", "ine", "ing",
+    "ion", "ist", "ite", "ock", "oke",
+    "old", "omp", "ong", "ood", "ook",
+    "oon", "ore", "ost", "out", "own",
+    "air", "ain", "aph", "ask", "int",
+    "ump", "unk", "atch", "ence",
+    "ever", "ther", "ough", "ment", "tion"
   ];
 
   const hearts = (filled) => {
@@ -115,16 +119,6 @@ if (content === "!blacktea") {
         );
         return;
       }
-
-      players.forEach((player) => {
-        const combo =
-          combos[Math.floor(Math.random() * combos.length)];
-
-        activeGames.set(player.id, {
-          combo,
-          lives: maxLives
-        });
-      });
 
       const firstCombo =
         combos[Math.floor(Math.random() * combos.length)];
@@ -196,14 +190,18 @@ if (activeGame) {
     }
 
     const combos = [
-      "ple",
-      "str",
-      "cha",
-      "ing",
-      "ous",
-      "ter",
-      "mon",
-      "ack"
+      "ple", "str", "cha", "ing", "ous",
+      "ter", "mon", "ack", "ash", "ice",
+      "ace", "ake", "all", "ame", "and",
+      "ant", "any", "ard", "art", "ate",
+      "ear", "ell", "est", "ick", "ide",
+      "ight", "ill", "ime", "ine", "ing",
+      "ion", "ist", "ite", "ock", "oke",
+      "old", "omp", "ong", "ood", "ook",
+      "oon", "ore", "ost", "out", "own",
+      "air", "ain", "aph", "ask", "int",
+      "ump", "unk", "atch", "ence", "ever",
+      "ther", "ough", "ment", "tion"
     ];
 
     const newCombo =
@@ -258,7 +256,7 @@ if (activeGame) {
 
 if (content.startsWith("!")) return;
 
-try
+try {
   const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {

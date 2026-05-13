@@ -28,6 +28,72 @@ client.on("messageCreate", async (message) => {
 if (message.content === "!coinflip") {
   const result = Math.random() < 0.5 ? "heads" : "tails";
 
+if (message.content === "!blacktea") {
+  const combos = [
+    "ple",
+    "str",
+    "cha",
+    "ing",
+    "ous",
+    "ter",
+    "mon",
+    "ack"
+  ];
+
+  const combo =
+    combos[Math.floor(Math.random() * combos.length)];
+
+  activeGames.set(message.author.id, combo);
+
+  await message.reply(
+    `type a real english word containing: **${combo}**\nyou have 10 seconds`
+  );
+
+  setTimeout(() => {
+    if (activeGames.has(message.author.id)) {
+      activeGames.delete(message.author.id);
+
+      message.reply(
+        `${message.author.username} ran out of time and lost`
+      );
+    }
+  }, 10000);
+
+  return;
+}
+  const activeCombo = activeGames.get(message.author.id);
+
+if (activeCombo) {
+  const word = message.content.toLowerCase();
+
+  if (!word.includes(activeCombo)) {
+    await message.reply(
+      `invalid word — it must contain "${activeCombo}"`
+    );
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+    );
+
+    if (!res.ok) {
+      await message.reply("that is not a real word");
+      return;
+    }
+
+    activeGames.delete(message.author.id);
+
+    await message.reply(
+      `${word} is valid. you win`
+    );
+  } catch {
+    await message.reply("dictionary check failed");
+  }
+
+  return;
+}
   await message.reply(`you got ${result}`);
   return;
 }

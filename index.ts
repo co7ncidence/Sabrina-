@@ -138,39 +138,52 @@ if (content === "!blacktea") {
         `blacktea started\nword must contain: ${firstCombo}\n10s left`
       );
 
-      const roundTimer = setInterval(async () => {
-        roundTime--;
+let roundTime = 10;
 
-        await lobbyMessage.edit(
-          `blacktea started\nword must contain: ${firstCombo}\n${roundTime}s left`
-        );
+await lobbyMessage.edit(
+  `blacktea started\nword must contain: **${firstCombo}**\n10s left`
+);
 
-        if (roundTime <= 0) {
-          clearInterval(roundTimer);
+const roundTimer = setInterval(async () => {
+  try {
+    roundTime--;
 
-          for (const player of players.values()) {
-            const game = activeGames.get(player.id);
+    if (roundTime <= 0) {
+      clearInterval(roundTimer);
 
-            if (!game) continue;
+      for (const player of players.values()) {
+        const game = activeGames.get(player.id);
 
-            game.lives--;
+        if (!game) continue;
 
-            if (game.lives <= 0) {
-              activeGames.delete(player.id);
+        game.lives--;
 
-              await message.channel.send(
-                `${player.username} ran out of time and is out`
-              );
+        if (game.lives <= 0) {
+          activeGames.delete(player.id);
 
-              continue;
-            }
+          await message.channel.send(
+            `${player.username} ran out of time and is out`
+          );
 
-            await message.channel.send(
-              `${player.username} lost a life\nlives: ${"♥️".repeat(game.lives)}`
-            );
-          }
+        } else {
+          await message.channel.send(
+            `${player.username} lost a life\nlives: ${"♥️".repeat(game.lives)}`
+          );
         }
-      }, 1000);
+      }
+
+      return;
+    }
+
+    await lobbyMessage.edit(
+      `blacktea started\nword must contain: **${firstCombo}**\n${roundTime}s left`
+    );
+
+  } catch (err) {
+    console.error(err);
+    clearInterval(roundTimer);
+  }
+}, 1000);
     }
   }, 1000);
 

@@ -27,7 +27,9 @@ client.on("messageCreate", async (message) => {
   if (message.author.id === client.user?.id) return;
 if (message.content === "!coinflip") {
   const result = Math.random() < 0.5 ? "heads" : "tails";
-
+await message.reply(`you got ${result}`);
+return;
+}
 if (message.content === "!blacktea") {
   const combos = [
     "ple",

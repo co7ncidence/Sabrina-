@@ -96,16 +96,20 @@ if (content === "!blacktea") {
   await lobbyMessage.react("🖤");
 
   const countdown = setInterval(async () => {
+  try {
     seconds--;
+
+    if (seconds < 0) {
+      clearInterval(countdown);
+      return;
+    }
 
     await lobbyMessage.edit(
       `blacktea starting in ${seconds} seconds\nreact with 🖤 to join\n\n${hearts(seconds)}`
     );
 
-  if (seconds <= 0) {
-  if (seconds < 0) return;
-
-  clearInterval(countdown);
+    if (seconds === 0) {
+      clearInterval(countdown);
 
       const reaction =
         lobbyMessage.reactions.cache.get("🖤");
@@ -114,9 +118,9 @@ if (content === "!blacktea") {
         ? await reaction.users.fetch()
         : null;
 
-     const players = users
-  ? users.filter((u) => !u.bot)
-  : null;
+      const players = users
+        ? users.filter((u) => !u.bot)
+        : null;
 
       if (!players || players.size === 0) {
         await lobbyMessage.edit(
@@ -135,57 +139,61 @@ if (content === "!blacktea") {
         });
       });
 
+      let roundTime = 10;
 
-let roundTime = 10;
+      await lobbyMessage.edit(
+        `blacktea started\nword must contain: **${firstCombo}**\n10s left`
+      );
 
-await lobbyMessage.edit(
-  `blacktea started\nword must contain: **${firstCombo}**\n10s left`
-);
+      const roundTimer = setInterval(async () => {
+        try {
+          roundTime--;
 
-const roundTimer = setInterval(async () => {
-  try {
-    roundTime--;
+          if (roundTime <= 0) {
+            clearInterval(roundTimer);
 
-    if (roundTime <= 0) {
-      clearInterval(roundTimer);
+            for (const player of players.values()) {
+              const game = activeGames.get(player.id);
 
-      for (const player of players.values()) {
-        const game = activeGames.get(player.id);
+              if (!game) continue;
 
-        if (!game) continue;
+              game.lives--;
 
-        game.lives--;
+              if (game.lives <= 0) {
+                activeGames.delete(player.id);
 
-        if (game.lives <= 0) {
-          activeGames.delete(player.id);
+                await message.channel.send(
+                  `${player.username} ran out of time and is out`
+                );
 
-          await message.channel.send(
-            `${player.username} ran out of time and is out`
+              } else {
+                await message.channel.send(
+                  `${player.username} lost a life\nlives: ${"♥️".repeat(game.lives)}`
+                );
+              }
+            }
+
+            return;
+          }
+
+          await lobbyMessage.edit(
+            `blacktea started\nword must contain: **${firstCombo}**\n${roundTime}s left`
           );
 
-        } else {
-          await message.channel.send(
-            `${player.username} lost a life\nlives: ${"♥️".repeat(game.lives)}`
-          );
+        } catch (err) {
+          console.error(err);
+          clearInterval(roundTimer);
         }
-      }
-
-      return;
+      }, 1000);
     }
-
-    await lobbyMessage.edit(
-      `blacktea started\nword must contain: **${firstCombo}**\n${roundTime}s left`
-    );
 
   } catch (err) {
     console.error(err);
-    clearInterval(roundTimer);
+    clearInterval(countdown);
   }
 }, 1000);
-    }
-  }, 1000);
 
-  return;
+return;
 }
 
 const activeGame = activeGames.get(message.author.id);

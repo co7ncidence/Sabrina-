@@ -130,12 +130,61 @@ if (content === "!blacktea") {
         });
       });
 
-      await lobbyMessage.edit(
-        `blacktea started\nword must contain: ${firstCombo}\n10s left`
-      );
-    }
-  }, 1000);
+      let startTimer = 10;
 
+await lobbyMessage.edit(
+
+  `blacktea started\nword must contain: **${firstCombo}**\n10s left`
+
+);
+
+const firstRoundTimer = setInterval(async () => {
+
+  startTimer--;
+
+  await lobbyMessage.edit(
+
+    `blacktea started\nword must contain: **${firstCombo}**\n${startTimer}s left`
+
+  );
+
+  if (startTimer <= 0) {
+
+    clearInterval(firstRoundTimer);
+
+    players.forEach(async (player) => {
+
+      const game = activeGames.get(player.id);
+
+      if (!game) return;
+
+      game.lives--;
+
+      if (game.lives <= 0) {
+
+        activeGames.delete(player.id);
+
+        await message.channel.send(
+
+          `${player.username} ran out of time and is out`
+
+        );
+
+        return;
+
+      }
+
+      await message.channel.send(
+
+        `${player.username} lost a life\nlives: ${"♥️".repeat(game.lives)}`
+
+      );
+
+    });
+
+  }
+
+}, 1000);      
   return;
 }
 

@@ -132,11 +132,6 @@ if (content === "!blacktea") {
         });
       });
 
-      let roundTime = 10;
-
-      await lobbyMessage.edit(
-        `blacktea started\nword must contain: ${firstCombo}\n10s left`
-      );
 
 let roundTime = 10;
 

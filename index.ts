@@ -197,8 +197,6 @@ const firstRoundTimer = setInterval(async () => {
 
   return;
 }
-  return;
-}
 
 const activeGame = activeGames.get(message.author.id);
 

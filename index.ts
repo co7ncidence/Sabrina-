@@ -50,21 +50,63 @@ if (content === "!blacktea") {
   const combo =
     combos[Math.floor(Math.random() * combos.length)];
 
-  activeGames.set(message.author.id, combo);
+  const hearts = (filled) => {
+    let result = "";
 
-  await message.reply(
-    `type a real english word containing: **${combo}**\nyou have 10 seconds`
+    for (let i = 0; i < 15; i++) {
+      result += i < filled ? "♥️" : "🖤";
+
+      if ((i + 1) % 5 === 0) result += "\n";
+    }
+
+    return result;
+  };
+
+  let seconds = 15;
+
+  const lobbyMessage = await message.reply(
+    `blacktea starting in 15 seconds\nreact with 🖤 to join\n\n${hearts(15)}`
   );
 
-  setTimeout(() => {
-    if (activeGames.has(message.author.id)) {
-      activeGames.delete(message.author.id);
+  await lobbyMessage.react("🖤");
 
-      message.reply(
-        `${message.author.username} ran out of time and lost`
+  const countdown = setInterval(async () => {
+    seconds--;
+
+    await lobbyMessage.edit(
+      `blacktea starting in ${seconds} seconds\nreact with 🖤 to join\n\n${hearts(seconds)}`
+    );
+
+    if (seconds <= 0) {
+      clearInterval(countdown);
+
+      const reaction =
+        lobbyMessage.reactions.cache.get("🖤");
+
+      const users = reaction
+        ? await reaction.users.fetch()
+        : null;
+
+      const players = users
+        ? users.filter((u) => !u.bot)
+        : [];
+
+      if (!players || players.size === 0) {
+        await lobbyMessage.edit(
+          "nobody joined blacktea 😔"
+        );
+        return;
+      }
+
+      players.forEach((player) => {
+        activeGames.set(player.id, combo);
+      });
+
+      await lobbyMessage.edit(
+        `blacktea started\nword must contain: **${combo}**`
       );
     }
-  }, 10000);
+  }, 1000);
 
   return;
 }

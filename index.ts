@@ -28,7 +28,6 @@ client.on("messageCreate", async (message) => {
 
   try {
     const response = await fetch(
-      model: "openai/gpt-oss-20b:free",
       {
         method: "POST",
         headers: {
@@ -36,7 +35,7 @@ client.on("messageCreate", async (message) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "mistralai/mistral-7b-instruct:free",
+          model: model: "openai/gpt-oss-20b:free",
           messages: [
             {
               role: "system",

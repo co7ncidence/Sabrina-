@@ -49,7 +49,7 @@ client.once("ready", () => {
     activities: [
       {
         name: "💋",
-        type: 1
+        type: 3
       }
     ],
     status: "dnd"

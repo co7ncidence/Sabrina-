@@ -156,7 +156,7 @@ return;
 
 const activeGame = activeGames.get(message.author.id);
 
-if (!activeGame?.active) return;
+if (activeGame?.active) {
 
 if (activeGame) {
   
@@ -265,29 +265,99 @@ const nextTurnTimer = setInterval(async () => {
   }
 
   if (newTimer <= 0) {
-    clearInterval(nextTurnTimer);
+  clearInterval(nextTurnTimer);
 
-    activeGame.lives--;
+  activeGame.lives--;
 
-    if (activeGame.lives <= 0) {
-      activeGames.delete(message.author.id);
-      playerTimers.delete(message.author.id);
+  if (activeGame.lives <= 0) {
+    activeGames.delete(message.author.id);
+    playerTimers.delete(message.author.id);
 
-      await newMessage.edit(
-        `${message.author.username} ran out of time and is out`
+    await newMessage.edit(
+      `${message.author.username} ran out of time and is out`
+    );
+
+    if (activeGames.size === 0) {
+      await message.channel.send(
+        "blacktea over\nall players are out"
       );
-
-      if (activeGames.size === 0) {
-        await message.channel.send(
-          "blacktea over\nall players are out"
-        );
-      }
-
-      return;
     }
 
     return;
   }
+
+  const anotherCombo =
+    combos[Math.floor(Math.random() * combos.length)];
+
+  activeGame.combo = anotherCombo;
+
+  await message.channel.send(
+    `time ran out\nlives: ${"♥️".repeat(activeGame.lives)}`
+  );
+
+  const continuedMessage = await message.channel.send(
+    `<@${message.author.id}> type a word containing: **${anotherCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+  );
+
+  let continuedTimer = 10;
+
+  const continuedInterval = setInterval(async () => {
+    continuedTimer--;
+
+    if (!activeGames.has(message.author.id)) {
+      clearInterval(continuedInterval);
+      return;
+    }
+
+    if (continuedTimer <= 0) {
+  clearInterval(continuedInterval);
+
+  activeGame.lives--;
+
+  if (activeGame.lives <= 0) {
+    activeGames.delete(message.author.id);
+    playerTimers.delete(message.author.id);
+
+    await continuedMessage.edit(
+      `${message.author.username} ran out of time and is out`
+    );
+
+    if (activeGames.size === 0) {
+      await message.channel.send(
+        "blacktea over\nall players are out"
+      );
+    }
+
+    return;
+  }
+
+  const nextComboAgain =
+    combos[Math.floor(Math.random() * combos.length)];
+
+  activeGame.combo = nextComboAgain;
+
+  await message.channel.send(
+    `time ran out\nlives: ${"♥️".repeat(activeGame.lives)}`
+  );
+
+  const nextMessage = await message.channel.send(
+    `<@${message.author.id}> type a word containing: **${nextComboAgain}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+  );
+
+  // you'd ideally restart another timer here
+  return;
+}
+
+    await continuedMessage.edit(
+      `<@${message.author.id}> type a word containing: **${anotherCombo}**\n${continuedTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+    );
+
+  }, 1000);
+
+  playerTimers.set(message.author.id, continuedInterval);
+
+  return;
+}
 
   await newMessage.edit(
     `<@${message.author.id}> type a word containing: **${nextCombo}**\n${newTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
@@ -316,7 +386,7 @@ return;
 
   return;
 }
-
+}
 if (content.startsWith("!")) return;
 if (activeGames.has(message.author.id)) return;
 

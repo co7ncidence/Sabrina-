@@ -302,9 +302,6 @@ try {
 } catch {
   await message.reply("dictionary check failed");
 }
-  } catch {
-    await message.reply("dictionary check failed");
-  }
 
   return;
 }

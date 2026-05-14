@@ -44,6 +44,17 @@ const client = new Client({
 });
 client.once("ready", () => {
   console.log(`Logged in as ${client.user?.tag}`);
+
+  client.user.setPresence({
+    activities: [
+      {
+        name: "blacktea",
+        type: 0
+      }
+    ],
+    status: "online"
+  });
+});
   client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 

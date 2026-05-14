@@ -140,54 +140,9 @@ if (content === "!blacktea") {
   active: true
 });
       });
-
-      let roundTime = 10;
-
-      await lobbyMessage.edit(
-        `blacktea started\nword must contain: **${firstCombo}**\n10s left`
-      );
-
-      const roundTimer = setInterval(async () => {
-        try {
-          roundTime--;
-
-          if (roundTime <= 0) {
-            clearInterval(roundTimer);
-
-            for (const player of players.values()) {
-              const game = activeGames.get(player.id);
-
-              if (!game) continue;
-
-              game.lives--;
-
-              if (game.lives <= 0) {
-                activeGames.delete(player.id);
-                playerTimers.delete(player.id);
-
-                await message.channel.send(
-                  `${player.username} ran out of time and is out`
-                );
-
-              } else {
-                await message.channel.send(
-                  `${player.username} lost a life\nlives: ${"♥️".repeat(game.lives)}`
-                );
-              }
-            }
-
-            return;
-          }
-
-          await lobbyMessage.edit(
-            `blacktea started\nword must contain: **${firstCombo}**\n${roundTime}s left`
-          );
-
-        } catch (err) {
-          console.error(err);
-          clearInterval(roundTimer);
-        }
-      }, 1000);
+await message.channel.send(
+  `<@${players.first().id}> type a word containing: **${firstCombo}**`
+);      
     }
 
   } catch (err) {
@@ -204,12 +159,7 @@ const activeGame = activeGames.get(message.author.id);
 if (!activeGame?.active) return;
 
 if (activeGame) {
-  const existingTimer = playerTimers.get(message.author.id);
-
-if (existingTimer) {
-  clearInterval(existingTimer);
-  playerTimers.delete(message.author.id);
-}
+  
   const word = content;
 
   if (!word.includes(activeGame.combo)) {
@@ -223,11 +173,18 @@ try {
   );
 
   if (!res.ok) {
-    await message.react("❌");
-    return;
-  }
+  await message.react("❌");
+  return;
+}
 
-  await message.react("✅");
+await message.react("✅");
+
+const existingTimer = playerTimers.get(message.author.id);
+
+if (existingTimer) {
+  clearInterval(existingTimer);
+  playerTimers.delete(message.author.id);
+}  
 
   const combos = [
     "ple", "str", "cha", "ing", "ous",
@@ -252,7 +209,7 @@ try {
   let timer = 10;
 
   const timerMessage = await message.channel.send(
-    `${message.author} type a word containing: **${newCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+    `<@${message.author.id}> type a word containing: **${newCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
   );
 
   const turnTimer = setInterval(async () => {
@@ -270,11 +227,16 @@ try {
 
       if (activeGame.lives <= 0) {
         activeGames.delete(message.author.id);
+        if (activeGames.size === 0) {
+  await message.channel.send(
+    "blacktea over\nall players are out"
+  );
+}
         playerTimers.delete(message.author.id);
 
         await timerMessage.edit(
-          `${message.author.username} ran out of time and is out`
-        );
+  `${message.author.username} ran out of time and is out`
+);
 
         return;
       }
@@ -292,8 +254,8 @@ try {
     }
 
     await timerMessage.edit(
-      `${message.author} type a word containing: **${newCombo}**\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
-    );
+  `<@${message.author.id}> type a word containing: **${newCombo}**\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+);
 
   }, 1000);
 

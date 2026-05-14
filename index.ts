@@ -2,6 +2,7 @@ import express from "express";
 import { Client, GatewayIntentBits } from "discord.js";
 const app = express();
 const activeGames = new Map();
+const playerTimers = new Map();
 let maxLives = 3;
 
 app.get("/", (_, res) => {
@@ -161,6 +162,7 @@ if (content === "!blacktea") {
 
               if (game.lives <= 0) {
                 activeGames.delete(player.id);
+                playerTimers.delete(player.id);
 
                 await message.channel.send(
                   `${player.username} ran out of time and is out`
@@ -199,6 +201,12 @@ return;
 const activeGame = activeGames.get(message.author.id);
 
 if (activeGame) {
+  const existingTimer = playerTimers.get(message.author.id);
+
+if (existingTimer) {
+  clearInterval(existingTimer);
+  playerTimers.delete(message.author.id);
+}
   const word = content;
 
   if (!word.includes(activeGame.combo)) {
@@ -206,6 +214,7 @@ if (activeGame) {
 
     if (activeGame.lives <= 0) {
       activeGames.delete(message.author.id);
+      playerTimers.delete(message.author.id);
 
       await message.reply(
         `wrong word\n🖤🖤🖤\n${message.author.username} is out`
@@ -231,6 +240,7 @@ if (activeGame) {
 
       if (activeGame.lives <= 0) {
         activeGames.delete(message.author.id);
+        playerTimers.delete(message.author.id);
 
         await message.reply(
           `${word} is not real\n${message.author.username} is out`
@@ -272,14 +282,17 @@ if (activeGame) {
       `${word} is valid\nnext word: ${newCombo}\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
     );
 
-    const turnTimer = setInterval(async () => {
-      timer--;
+   const turnTimer = setInterval(async () => {
+  timer--;
+     playerTimers.set(message.author.id, turnTimer);
 
       if (!activeGames.has(message.author.id)) {
         clearInterval(turnTimer);
         return;
       }
 
+if (timer <= 0) return;
+     
       await timerMessage.edit(
         `${word} is valid\nnext word: ${newCombo}\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
       );
@@ -291,6 +304,7 @@ if (activeGame) {
 
         if (activeGame.lives <= 0) {
           activeGames.delete(message.author.id);
+          playerTimers.delete(message.author.id);
 
           await timerMessage.edit(
             `${message.author.username} ran out of time and is out`
@@ -312,6 +326,7 @@ if (activeGame) {
 }
 
 if (content.startsWith("!")) return;
+if (activeGames.has(message.author.id)) return;
 
 try {
   const response = await fetch(

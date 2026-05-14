@@ -135,9 +135,10 @@ if (content === "!blacktea") {
 
       players.forEach((player) => {
         activeGames.set(player.id, {
-          combo: firstCombo,
-          lives: maxLives
-        });
+  combo: firstCombo,
+  lives: maxLives,
+  active: true
+});
       });
 
       let roundTime = 10;
@@ -200,6 +201,8 @@ return;
 
 const activeGame = activeGames.get(message.author.id);
 
+if (!activeGame?.active) return;
+
 if (activeGame) {
   const existingTimer = playerTimers.get(message.author.id);
 
@@ -210,114 +213,95 @@ if (existingTimer) {
   const word = content;
 
   if (!word.includes(activeGame.combo)) {
-    activeGame.lives--;
+  await message.react("❌");
+  return;
+}
 
-    if (activeGame.lives <= 0) {
-      activeGames.delete(message.author.id);
-      playerTimers.delete(message.author.id);
+try {
+  const res = await fetch(
+    `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+  );
 
-      await message.reply(
-        `wrong word\n🖤🖤🖤\n${message.author.username} is out`
-      );
-
-      return;
-    }
-
-    await message.reply(
-      `wrong word\nlives left: ${"♥️".repeat(activeGame.lives)}`
-    );
-
+  if (!res.ok) {
+    await message.react("❌");
     return;
   }
 
-  try {
-    const res = await fetch(
-      `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-    );
+  await message.react("✅");
 
-    if (!res.ok) {
+  const combos = [
+    "ple", "str", "cha", "ing", "ous",
+    "ter", "mon", "ack", "ash", "ice",
+    "ace", "ake", "all", "ame", "and",
+    "ant", "any", "ard", "art", "ate",
+    "ear", "ell", "est", "ick", "ide",
+    "ight", "ill", "ime", "ine", "ing",
+    "ion", "ist", "ite", "ock", "oke",
+    "old", "omp", "ong", "ood", "ook",
+    "oon", "ore", "ost", "out", "own",
+    "air", "ain", "aph", "ask", "int",
+    "ump", "unk", "atch", "ence", "ever",
+    "ther", "ough", "ment", "tion"
+  ];
+
+  const newCombo =
+    combos[Math.floor(Math.random() * combos.length)];
+
+  activeGame.combo = newCombo;
+
+  let timer = 10;
+
+  const timerMessage = await message.channel.send(
+    `${message.author} type a word containing: **${newCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+  );
+
+  const turnTimer = setInterval(async () => {
+    timer--;
+
+    if (!activeGames.has(message.author.id)) {
+      clearInterval(turnTimer);
+      return;
+    }
+
+    if (timer <= 0) {
+      clearInterval(turnTimer);
+
       activeGame.lives--;
 
       if (activeGame.lives <= 0) {
         activeGames.delete(message.author.id);
         playerTimers.delete(message.author.id);
 
-        await message.reply(
-          `${word} is not real\n${message.author.username} is out`
+        await timerMessage.edit(
+          `${message.author.username} ran out of time and is out`
         );
 
         return;
       }
 
-      await message.reply(
-        `${word} is not real\nlives left: ${"♥️".repeat(activeGame.lives)}`
+      const nextCombo =
+        combos[Math.floor(Math.random() * combos.length)];
+
+      activeGame.combo = nextCombo;
+
+      await timerMessage.edit(
+        `time ran out\nnew word: **${nextCombo}**\nlives: ${"♥️".repeat(activeGame.lives)}`
       );
 
       return;
     }
 
-    const combos = [
-      "ple", "str", "cha", "ing", "ous",
-      "ter", "mon", "ack", "ash", "ice",
-      "ace", "ake", "all", "ame", "and",
-      "ant", "any", "ard", "art", "ate",
-      "ear", "ell", "est", "ick", "ide",
-      "ight", "ill", "ime", "ine", "ing",
-      "ion", "ist", "ite", "ock", "oke",
-      "old", "omp", "ong", "ood", "ook",
-      "oon", "ore", "ost", "out", "own",
-      "air", "ain", "aph", "ask", "int",
-      "ump", "unk", "atch", "ence", "ever",
-      "ther", "ough", "ment", "tion"
-    ];
-
-    const newCombo =
-      combos[Math.floor(Math.random() * combos.length)];
-
-    activeGame.combo = newCombo;
-
-    let timer = 10;
-
-    const timerMessage = await message.reply(
-      `${word} is valid\nnext word: ${newCombo}\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+    await timerMessage.edit(
+      `${message.author} type a word containing: **${newCombo}**\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
     );
 
-   const turnTimer = setInterval(async () => {
-  timer--;
-     playerTimers.set(message.author.id, turnTimer);
+  }, 1000);
 
-      if (!activeGames.has(message.author.id)) {
-        clearInterval(turnTimer);
-        return;
-      }
+  playerTimers.set(message.author.id, turnTimer);
 
-if (timer <= 0) return;
-     
-      await timerMessage.edit(
-        `${word} is valid\nnext word: ${newCombo}\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
-      );
-
-      if (timer <= 0) {
-        clearInterval(turnTimer);
-
-        activeGame.lives--;
-
-        if (activeGame.lives <= 0) {
-          activeGames.delete(message.author.id);
-          playerTimers.delete(message.author.id);
-
-          await timerMessage.edit(
-            `${message.author.username} ran out of time and is out`
-          );
-
-          return;
-        }
-
-        await timerMessage.edit(
-          `time ran out\nlives: ${"♥️".repeat(activeGame.lives)}`
-        );
-      }
-    }, 1000);
+} catch {
+  await message.reply("dictionary check failed");
+}
   } catch {
     await message.reply("dictionary check failed");
   }

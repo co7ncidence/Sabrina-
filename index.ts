@@ -44,6 +44,21 @@ const client = new Client({
 });
 client.once("ready", () => {
   console.log(`Logged in as ${client.user?.tag}`);
+  client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === "whisper") {
+    const text =
+      interaction.options.getString("text");
+
+    await interaction.reply({
+      content: "whisper sent",
+      ephemeral: true
+    });
+
+    await interaction.channel.send(text);
+  }
+});
 });
 client.removeAllListeners("messageCreate");
 client.on("messageCreate", async (message) => {

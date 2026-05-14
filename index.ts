@@ -1,9 +1,30 @@
 import express from "express";
-import { Client, GatewayIntentBits } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  PermissionFlagsBits
+} from "discord.js";
 const app = express();
 const activeGames = new Map();
 const playerTimers = new Map();
 let maxLives = 3;
+const commands = [
+  new SlashCommandBuilder()
+    .setName("whisper")
+    .setDescription("make sabrina say something")
+    .addStringOption(option =>
+      option
+        .setName("text")
+        .setDescription("what sabrina should say")
+        .setRequired(true)
+    )
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.ManageMessages
+    )
+].map(command => command.toJSON());
 
 app.get("/", (_, res) => {
   res.send("Bot is running");
@@ -475,4 +496,22 @@ Use natural lowercase typing often.
   }
 });
 
+const rest = new REST({ version: "10" }).setToken(
+  process.env.DISCORD_TOKEN
+);
+
+(async () => {
+  try {
+    console.log("Registering slash commands...");
+
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID),
+      { body: commands }
+    );
+
+    console.log("Slash commands registered.");
+  } catch (error) {
+    console.error(error);
+  }
+})();
 client.login(process.env.DISCORD_TOKEN);

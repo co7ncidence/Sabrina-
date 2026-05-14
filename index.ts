@@ -70,7 +70,6 @@ client.once("ready", () => {
     await interaction.channel.send(text);
   }
 });
-});
 client.removeAllListeners("messageCreate");
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;

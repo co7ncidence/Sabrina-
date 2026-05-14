@@ -242,13 +242,62 @@ if (existingTimer) {
       }
 
       const nextCombo =
-        combos[Math.floor(Math.random() * combos.length)];
+  combos[Math.floor(Math.random() * combos.length)];
 
-      activeGame.combo = nextCombo;
+activeGame.combo = nextCombo;
 
-      await timerMessage.edit(
-        `time ran out\nnew word: **${nextCombo}**\nlives: ${"♥️".repeat(activeGame.lives)}`
+await message.channel.send(
+  `time ran out\nlives: ${"♥️".repeat(activeGame.lives)}`
+);
+
+const newMessage = await message.channel.send(
+  `<@${message.author.id}> type a word containing: **${nextCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+);
+
+let newTimer = 10;
+
+const nextTurnTimer = setInterval(async () => {
+  newTimer--;
+
+  if (!activeGames.has(message.author.id)) {
+    clearInterval(nextTurnTimer);
+    return;
+  }
+
+  if (newTimer <= 0) {
+    clearInterval(nextTurnTimer);
+
+    activeGame.lives--;
+
+    if (activeGame.lives <= 0) {
+      activeGames.delete(message.author.id);
+      playerTimers.delete(message.author.id);
+
+      await newMessage.edit(
+        `${message.author.username} ran out of time and is out`
       );
+
+      if (activeGames.size === 0) {
+        await message.channel.send(
+          "blacktea over\nall players are out"
+        );
+      }
+
+      return;
+    }
+
+    return;
+  }
+
+  await newMessage.edit(
+    `<@${message.author.id}> type a word containing: **${nextCombo}**\n${newTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+  );
+
+}, 1000);
+
+playerTimers.set(message.author.id, nextTurnTimer);
+
+return;
 
       return;
     }

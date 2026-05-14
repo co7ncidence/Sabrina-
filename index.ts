@@ -48,11 +48,11 @@ client.once("ready", () => {
   client.user.setPresence({
     activities: [
       {
-        name: "blacktea",
-        type: 0
+        name: "💋",
+        type: 1
       }
     ],
-    status: "online"
+    status: "dnd"
   });
 });
   client.on("interactionCreate", async (interaction) => {

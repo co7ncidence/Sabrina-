@@ -236,6 +236,10 @@ if (content === "!blacktea") {
   "eau", "xpl", "qua", "xth",
   "pti", "gue", "phl", "rhy",
   "mnk", "vow"
+
+  "scr", "shr", "spl", "spr", "thr",
+"wr", "mb", "gn", "pt", "ctu",
+"zle", "mph", "ttl", "rlds", "zzl"  
 ];
 
   const hearts = (filled) => {
@@ -377,6 +381,10 @@ if (existingTimer) {
   "eau", "xpl", "qua", "xth",
   "pti", "gue", "phl", "rhy",
   "mnk", "vow"
+
+  "scr", "shr", "spl", "spr", "thr",
+"wr", "mb", "gn", "pt", "ctu",
+"zle", "mph", "ttl", "rlds", "zzl"  
 ];
 
   const newCombo =

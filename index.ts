@@ -74,7 +74,15 @@ client.removeAllListeners("messageCreate");
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
+  
 const content = message.content.toLowerCase();
+
+  if (
+  content.startsWith("!") &&
+  content !== "!blacktea" &&
+  content !== "!coinflip" &&
+  !content.startsWith("!blacktea lives")
+) return;
   if (activeGames.has(message.author.id)) {
   const activeGame = activeGames.get(message.author.id);
 
@@ -470,9 +478,6 @@ return;
   return;
 }
 }
-if (activeGames.has(message.author.id)) return;
-if (content.startsWith("!")) return;
-if (activeGames.has(message.author.id)) return;
 
 try {
   const response = await fetch(

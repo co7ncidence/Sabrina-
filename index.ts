@@ -106,19 +106,34 @@ if (content.startsWith("!blacktea lives")) {
 
 if (content === "!blacktea") {
   const combos = [
-    "ple", "str", "cha", "ing", "ous",
-    "ter", "mon", "ack", "ash", "ice",
-    "ace", "ake", "all", "ame", "and",
-    "ant", "any", "ard", "art", "ate",
-    "ear", "ell", "est", "ick", "ide",
-    "ight", "ill", "ime", "ine", "ion",
-    "ist", "ite", "ock", "oke", "old",
-    "omp", "ong", "ood", "ook", "oon",
-    "ore", "ost", "out", "own", "air",
-    "ain", "aph", "ask", "int", "ump",
-    "unk", "atch", "ence", "ever",
-    "ther", "ough", "ment", "tion"
-  ];
+    const combos = [
+  "ple", "str", "cha", "ing", "ous",
+  "ter", "mon", "ack", "ash", "ice",
+  "ace", "ake", "all", "ame", "and",
+  "ant", "any", "ard", "art", "ate",
+  "ear", "ell", "est", "ick", "ide",
+  "ight", "ill", "ime", "ine", "ion",
+  "ist", "ite", "ock", "oke", "old",
+  "omp", "ong", "ood", "ook", "oon",
+  "ore", "ost", "out", "own", "air",
+  "ain", "aph", "ask", "int", "ump",
+  "unk", "atch", "ence", "ever",
+  "ther", "ough", "ment", "tion",
+
+  "ang", "ess", "ent", "ble",
+  "red", "lin", "row", "den",
+  "tor", "cal",
+
+  "rph", "lth", "nch", "rld",
+  "tch", "dge", "rve", "mpt",
+  "nth", "lve", "wns", "rch",
+  "ski", "rts", "dth", "nks",
+  "fts", "rns", "ght", "lps",
+
+  "eau", "xpl", "qua", "xth",
+  "pti", "gue", "phl", "rhy",
+  "mnk", "vow"
+];
 
   const hearts = (filled) => {
     let result = "";
@@ -233,19 +248,34 @@ if (existingTimer) {
 }  
 
   const combos = [
-    "ple", "str", "cha", "ing", "ous",
-    "ter", "mon", "ack", "ash", "ice",
-    "ace", "ake", "all", "ame", "and",
-    "ant", "any", "ard", "art", "ate",
-    "ear", "ell", "est", "ick", "ide",
-    "ight", "ill", "ime", "ine", "ing",
-    "ion", "ist", "ite", "ock", "oke",
-    "old", "omp", "ong", "ood", "ook",
-    "oon", "ore", "ost", "out", "own",
-    "air", "ain", "aph", "ask", "int",
-    "ump", "unk", "atch", "ence", "ever",
-    "ther", "ough", "ment", "tion"
-  ];
+    const combos = [
+  "ple", "str", "cha", "ing", "ous",
+  "ter", "mon", "ack", "ash", "ice",
+  "ace", "ake", "all", "ame", "and",
+  "ant", "any", "ard", "art", "ate",
+  "ear", "ell", "est", "ick", "ide",
+  "ight", "ill", "ime", "ine", "ion",
+  "ist", "ite", "ock", "oke", "old",
+  "omp", "ong", "ood", "ook", "oon",
+  "ore", "ost", "out", "own", "air",
+  "ain", "aph", "ask", "int", "ump",
+  "unk", "atch", "ence", "ever",
+  "ther", "ough", "ment", "tion",
+
+  "ang", "ess", "ent", "ble",
+  "red", "lin", "row", "den",
+  "tor", "cal",
+
+  "rph", "lth", "nch", "rld",
+  "tch", "dge", "rve", "mpt",
+  "nth", "lve", "wns", "rch",
+  "ski", "rts", "dth", "nks",
+  "fts", "rns", "ght", "lps",
+
+  "eau", "xpl", "qua", "xth",
+  "pti", "gue", "phl", "rhy",
+  "mnk", "vow"
+];
 
   const newCombo =
     combos[Math.floor(Math.random() * combos.length)];

@@ -106,7 +106,6 @@ if (content.startsWith("!blacktea lives")) {
 
 if (content === "!blacktea") {
   const combos = [
-    const combos = [
   "ple", "str", "cha", "ing", "ous",
   "ter", "mon", "ack", "ash", "ice",
   "ace", "ake", "all", "ame", "and",
@@ -248,7 +247,6 @@ if (existingTimer) {
 }  
 
   const combos = [
-    const combos = [
   "ple", "str", "cha", "ing", "ous",
   "ter", "mon", "ack", "ash", "ice",
   "ace", "ake", "all", "ame", "and",

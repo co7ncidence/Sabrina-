@@ -26,27 +26,9 @@ const commands = [
       PermissionFlagsBits.ManageMessages
     ),
 
-  new SlashCommandBuilder()
-    .setName("snipe")
-    .setDescription("show the last deleted message"),
-
-  new SlashCommandBuilder()
-    .setName("ship")
-    .setDescription("ship two people together")
-    .addUserOption(option =>
-      option
-        .setName("user1")
-        .setDescription("first person")
-        .setRequired(true)
-    )
-    .addUserOption(option =>
-      option
-        .setName("user2")
-        .setDescription("second person")
-        .setRequired(true)
-    )
-
-].map(command => command.toJSON());
+new SlashCommandBuilder()
+  .setName("snipe")
+  .setDescription("show the last deleted message"),
 
 new SlashCommandBuilder()
   .setName("ship")
@@ -63,7 +45,7 @@ new SlashCommandBuilder()
       .setDescription("second person")
       .setRequired(true)
   )
-  
+
 ].map(command => command.toJSON());
 
 app.get("/", (_, res) => {

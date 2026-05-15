@@ -10,6 +10,7 @@ import {
 const app = express();
 const activeGames = new Map();
 const playerTimers = new Map();
+const snipes = new Map();
 let maxLives = 3;
 const commands = [
   new SlashCommandBuilder()
@@ -23,7 +24,11 @@ const commands = [
     )
     .setDefaultMemberPermissions(
       PermissionFlagsBits.ManageMessages
-    )
+    ),
+  new SlashCommandBuilder()
+  .setName("snipe")
+  .setDescription("show the last deleted message")
+  
 ].map(command => command.toJSON());
 
 app.get("/", (_, res) => {
@@ -59,18 +64,49 @@ client.once("ready", () => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "whisper") {
-    const text =
-      interaction.options.getString("text");
+  const text =
+    interaction.options.getString("text");
 
-    await interaction.reply({
-      content: "whisper sent",
-      ephemeral: true
-    });
+  await interaction.reply({
+    content: "whisper sent",
+    ephemeral: true
+  });
 
-    await interaction.channel.send(text);
+  await interaction.channel.send(text);
+}
+
+  if (interaction.commandName === "snipe") {
+
+    const snipe = snipes.get(interaction.channel.id);
+
+    if (!snipe) {
+      await interaction.reply({
+        content: "nothing to snipe",
+        ephemeral: true
+      });
+
+      return;
+    }
+
+    await interaction.reply(
+  `deleted message from **${snipe.author}**\n> ${
+    snipe.content || "*no text content*"
+  }`
+);
   }
 });
+client.on("messageDelete", async (message) => {
+  if (!message.guild) return;
+  if (message.author?.bot) return;
+
+  snipes.set(message.channel.id, {
+  content: message.content,
+  author: message.author.username,
+  time: Date.now()
+});
+});
 client.removeAllListeners("messageCreate");
+
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;

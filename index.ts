@@ -25,9 +25,44 @@ const commands = [
     .setDefaultMemberPermissions(
       PermissionFlagsBits.ManageMessages
     ),
+
   new SlashCommandBuilder()
-  .setName("snipe")
-  .setDescription("show the last deleted message")
+    .setName("snipe")
+    .setDescription("show the last deleted message"),
+
+  new SlashCommandBuilder()
+    .setName("ship")
+    .setDescription("ship two people together")
+    .addUserOption(option =>
+      option
+        .setName("user1")
+        .setDescription("first person")
+        .setRequired(true)
+    )
+    .addUserOption(option =>
+      option
+        .setName("user2")
+        .setDescription("second person")
+        .setRequired(true)
+    )
+
+].map(command => command.toJSON());
+
+new SlashCommandBuilder()
+  .setName("ship")
+  .setDescription("ship two people together")
+  .addUserOption(option =>
+    option
+      .setName("user1")
+      .setDescription("first person")
+      .setRequired(true)
+  )
+  .addUserOption(option =>
+    option
+      .setName("user2")
+      .setDescription("second person")
+      .setRequired(true)
+  )
   
 ].map(command => command.toJSON());
 
@@ -94,6 +129,40 @@ client.once("ready", () => {
   }`
 );
   }
+if (interaction.commandName === "ship") {
+
+  const user1 =
+    interaction.options.getUser("user1");
+
+  const user2 =
+    interaction.options.getUser("user2");
+
+  const percent =
+    Math.floor(Math.random() * 101);
+
+  let shipMessage = "";
+
+  if (percent < 20) {
+    shipMessage =
+      "this would end in a restraining order";
+  } else if (percent < 40) {
+    shipMessage =
+      "cooked";
+  } else if (percent < 60) {
+    shipMessage =
+      "kinda toxic but it works";
+  } else if (percent < 80) {
+    shipMessage =
+      "lowkey cute";
+  } else {
+    shipMessage =
+      "actually soulmates";
+  }
+
+  await interaction.reply(
+    `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`
+  );
+}    
 });
 client.on("messageDelete", async (message) => {
   if (!message.guild) return;

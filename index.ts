@@ -75,6 +75,15 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
 const content = message.content.toLowerCase();
+  if (activeGames.has(message.author.id)) {
+  const activeGame = activeGames.get(message.author.id);
+
+  if (content.includes(activeGame.combo)) {
+    // let the game continue normally
+  } else {
+    return;
+  }
+}
 
 if (content === "!coinflip") {
   const result = Math.random() < 0.5 ? "heads" : "tails";
@@ -461,6 +470,7 @@ return;
   return;
 }
 }
+if (activeGames.has(message.author.id)) return;
 if (content.startsWith("!")) return;
 if (activeGames.has(message.author.id)) return;
 

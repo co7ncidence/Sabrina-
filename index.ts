@@ -91,18 +91,20 @@ client.once("ready", () => {
   client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
+  // whisper
   if (interaction.commandName === "whisper") {
-  const text =
-    interaction.options.getString("text");
+    const text =
+      interaction.options.getString("text");
 
-  await interaction.reply({
-    content: "whisper sent",
-    ephemeral: true
-  });
+    await interaction.reply({
+      content: "whisper sent",
+      ephemeral: true
+    });
 
-  await interaction.channel.send(text);
-}
+    await interaction.channel.send(text);
+  }
 
+  // snipe
   if (interaction.commandName === "snipe") {
 
     const snipe = snipes.get(interaction.channel.id);
@@ -117,71 +119,75 @@ client.once("ready", () => {
     }
 
     await interaction.reply(
-  `deleted message from **${snipe.author}**\n> ${
-    snipe.content || "*no text content*"
-  }`
-);
-  }
-if (interaction.commandName === "ship") {
-
-  const user1 =
-    interaction.options.getUser("user1");
-
-  const user2 =
-    interaction.options.getUser("user2");
-
-  const percent =
-    Math.floor(Math.random() * 101);
-
-  let shipMessage = "";
-
-  if (percent < 20) {
-    shipMessage =
-      "this would end in a restraining order";
-  } else if (percent < 40) {
-    shipMessage =
-      "cooked";
-  } else if (percent < 60) {
-    shipMessage =
-      "kinda toxic but it works";
-  } else if (percent < 80) {
-    shipMessage =
-      "lowkey cute";
-  } else {
-    shipMessage =
-      "actually soulmates";
+      `deleted message from **${snipe.author}**\n> ${
+        snipe.content || "*no text content*"
+      }`
+    );
   }
 
-  await interaction.reply(
-    `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`
-  );
-}
+  // ship
+  if (interaction.commandName === "ship") {
 
-if (interaction.commandName === "dirtytalk") {
+    const user1 =
+      interaction.options.getUser("user1");
 
-  const user =
-    interaction.options.getUser("user");
+    const user2 =
+      interaction.options.getUser("user2");
 
-  const lines = [
-    "come here pretty boy",
-    "you look easy to manipulate",
-    "lowkey wanna ruin your life a little",
-    "ur one dm away from making bad decisions",
-    "you look like you text back instantly",
-    "i could flirt with you for 5 minutes and you'd fold",
-    "you seem dangerously attention deprived",
-    "you look like you'd get attached fast",
-    "i just know ur obsessed with me already",
-    "you'd absolutely lose an argument to me"
-  ];
+    const percent =
+      Math.floor(Math.random() * 101);
 
-  const randomLine =
-    lines[Math.floor(Math.random() * lines.length)];
+    let shipMessage = "";
 
-  await interaction.reply(
-    `💋 ${user}\n${randomLine}`
-  );
-}
+    if (percent < 20) {
+      shipMessage =
+        "this would end in a restraining order";
+    } else if (percent < 40) {
+      shipMessage =
+        "cooked";
+    } else if (percent < 60) {
+      shipMessage =
+        "kinda toxic but it works";
+    } else if (percent < 80) {
+      shipMessage =
+        "lowkey cute";
+    } else {
+      shipMessage =
+        "actually soulmates";
+    }
+
+    await interaction.reply(
+      `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`
+    );
+  }
+
+  // dirtytalk
+  if (interaction.commandName === "dirtytalk") {
+
+    const user =
+      interaction.options.getUser("user");
+
+    const lines = [
+      "come here pretty boy",
+      "you look easy to manipulate",
+      "lowkey wanna ruin your life a little",
+      "ur one dm away from making bad decisions",
+      "you look like you text back instantly",
+      "i could flirt with you for 5 minutes and you'd fold",
+      "you seem dangerously attention deprived",
+      "you look like you'd get attached fast",
+      "i just know ur obsessed with me already",
+      "you'd absolutely lose an argument to me"
+    ];
+
+    const randomLine =
+      lines[Math.floor(Math.random() * lines.length)];
+
+    await interaction.reply(
+      `💋 ${user}\n${randomLine}`
+    );
+  }
+});
 
   await interaction.reply(
     `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`

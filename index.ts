@@ -92,17 +92,19 @@ client.once("ready", () => {
   if (!interaction.isChatInputCommand()) return;
 
   // whisper
-  if (interaction.commandName === "whisper") {
-    const text =
-      interaction.options.getString("text");
+if (interaction.commandName === "whisper") {
+  const text =
+    interaction.options.getString("text");
 
-    await interaction.reply({
-      content: "whisper sent",
-      ephemeral: true
-    });
+  await interaction.reply({
+    content: "anonymous message sent",
+    ephemeral: true
+  });
 
-    await interaction.channel.send(text);
-  }
+  await interaction.channel?.send({
+    content: `💌 ${text}`
+  });
+}
 
   // snipe
   if (interaction.commandName === "snipe") {

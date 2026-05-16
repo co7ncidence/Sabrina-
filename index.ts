@@ -30,6 +30,40 @@ const app = express();
 const blackteaGames = new Map();
 const playerTimers = new Map();
 const snipes = new Map();
+
+const combos = [
+  "ple", "str", "cha", "ing", "ous",
+  "ter", "mon", "ack", "ash", "ice",
+  "ace", "ake", "all", "ame", "and",
+  "ant", "any", "ard", "art", "ate",
+  "ear", "ell", "est", "ick", "ide",
+  "ight", "ill", "ime", "ine", "ion",
+  "ist", "ite", "ock", "oke", "old",
+  "omp", "ong", "ood", "ook", "oon",
+  "ore", "ost", "out", "own", "air",
+  "ain", "aph", "ask", "int", "ump",
+  "unk", "atch", "ence", "ever",
+  "ther", "ough", "ment", "tion",
+
+  "ang", "ess", "ent", "ble",
+  "red", "lin", "row", "den",
+  "tor", "cal",
+
+  "rph", "lth", "nch", "rld",
+  "tch", "dge", "rve", "mpt",
+  "nth", "lve", "wns", "rch",
+  "ski", "rts", "dth", "nks",
+  "fts", "rns", "ght", "lps",
+
+  "eau", "xpl", "qua", "xth",
+  "pti", "gue", "phl", "rhy",
+  "mnk", "vow",
+
+  "scr", "shr", "spl", "spr", "thr",
+"wr", "mb", "gn", "pt", "ctu",
+"zle", "mph", "ttl", "rlds", "zzl"  
+];
+
 let maxLives = 3;
 const commands = [
   new SlashCommandBuilder()
@@ -450,7 +484,7 @@ if (
 ) return;
 
 
-if (content === "!coinflip") {
+if (lowered === "!coinflip") {
   const result = Math.random() < 0.5 ? "heads" : "tails";
 
   await message.reply(`you got ${result}`);
@@ -458,7 +492,7 @@ if (content === "!coinflip") {
 }
 
 
-if (content.startsWith("!blacktea lives")) {
+if (lowered.startsWith("!blacktea lives")) {
   const args = content.split(" ");
   const lives = Number(args[2]);
 
@@ -479,39 +513,7 @@ if (content.startsWith("!blacktea lives")) {
 }
 
 if (lowered === "!blacktea") {
-  const combos = [
-  "ple", "str", "cha", "ing", "ous",
-  "ter", "mon", "ack", "ash", "ice",
-  "ace", "ake", "all", "ame", "and",
-  "ant", "any", "ard", "art", "ate",
-  "ear", "ell", "est", "ick", "ide",
-  "ight", "ill", "ime", "ine", "ion",
-  "ist", "ite", "ock", "oke", "old",
-  "omp", "ong", "ood", "ook", "oon",
-  "ore", "ost", "out", "own", "air",
-  "ain", "aph", "ask", "int", "ump",
-  "unk", "atch", "ence", "ever",
-  "ther", "ough", "ment", "tion",
-
-  "ang", "ess", "ent", "ble",
-  "red", "lin", "row", "den",
-  "tor", "cal",
-
-  "rph", "lth", "nch", "rld",
-  "tch", "dge", "rve", "mpt",
-  "nth", "lve", "wns", "rch",
-  "ski", "rts", "dth", "nks",
-  "fts", "rns", "ght", "lps",
-
-  "eau", "xpl", "qua", "xth",
-  "pti", "gue", "phl", "rhy",
-  "mnk", "vow",
-
-  "scr", "shr", "spl", "spr", "thr",
-"wr", "mb", "gn", "pt", "ctu",
-"zle", "mph", "ttl", "rlds", "zzl"  
-];
-
+  
   const hearts = (filled) => {
     let result = "";
 

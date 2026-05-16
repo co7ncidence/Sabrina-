@@ -709,8 +709,8 @@ const turnTimer = setTimeout(async () => {
   }
 }
 
-const nextPlayer =
-  currentGame.players[currentGame.turnIndex];
+  const nextPlayer =
+    currentGame.players[currentGame.turnIndex];
 
   const nextCombo =
     combos[Math.floor(Math.random() * combos.length)];
@@ -720,6 +720,8 @@ const nextPlayer =
   await message.channel.send(
     `<@${nextPlayer.id}> type a word containing: **${nextCombo}**`
   );
+  
+}); // closes setTimeout callback
 
 }, 10000);
 

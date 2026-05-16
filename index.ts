@@ -603,6 +603,12 @@ if (lowered.startsWith("!blacktea lives")) {
 }
 
 if (lowered === "!blacktea") {
+if (blackteaGames.has(message.channel.id)) {
+  await message.reply(
+    "a blacktea game is already running"
+  );
+  return;
+}  
   
   const hearts = (filled) => {
     let result = "";
@@ -742,31 +748,28 @@ startTurn(message.channel, game);
   console.error(err);
   await message.reply("dictionary check failed");
 }
-
+  
 return;
-});
-
-client.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
-if (message.author.id === client.user?.id) return;
+  
 if (!message.mentions.has(client.user)) return;
-      
+
 try {
+
   const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-         model: "openai/gpt-oss-20b:free",
-          messages: [
-            {
-              role: "system",
-              content: `
-You are Sabrina Carpenter in a private Discord server.
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-oss-20b:free",
+        messages: [
+          {
+            role: "system",
+            content: 
+          `You are Sabrina Carpenter in a private Discord server.
 
 You are not an assistant.
 You are not wholesome.
@@ -810,36 +813,43 @@ Examples of tone:
 
 Talk like a real chronically online 20-something in Discord VC.
 Use natural lowercase typing often.
-`
-            },
-            {
-              role: "user",
-              content: message.content
-            }
-          ]
-        })
-      }
-    );
+`    
+          },
+          {
+            role: "user",
+            content: message.content
+          }
+        ]
+      })
+    }
+  );
 
-if (!response.ok) {
-  console.log(await response.text());
-  return;
+  if (!response.ok) {
+    console.log(await response.text());
+    return;
+  }
+
+  const data = await response.json();
+
+  const reply =
+    data.choices?.[0]?.message?.content;
+
+  if (!reply) return;
+
+  await message.reply(reply);
+
+} catch (err) {
+
+  console.error(err);
+
+  await message.reply(
+    "Something broke."
+  );
 }
   
-    const data = await response.json();
- const reply = data.choices?.[0]?.message?.content;
-
-    if (!reply) {
-      console.log(data);
-      return;
-    }
-
-    await message.reply(reply);
-  } catch (err) {
-    console.error(err);
-    await message.reply("Something broke.");
-  }
+return;
 });
+
 
 const rest = new REST({ version: "10" }).setToken(
   process.env.DISCORD_TOKEN

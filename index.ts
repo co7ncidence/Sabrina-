@@ -199,7 +199,7 @@ if (interaction.commandName === "dirtytalk") {
   await interaction.channel.send({
   embeds: [
     {
-      color: randomColor,
+      color: 0xff2d8d,
 
       author: {
         name: "☎ SABRINA HOTLINE"

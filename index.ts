@@ -8,7 +8,8 @@ import {
   PermissionFlagsBits
 } from "discord.js";
 import fs from "fs";
-
+process.on("unhandledRejection", console.error);
+process.on("uncaughtException", console.error);
 const marriagesFile = "./marriages.json";
 
 let marriages = {};
@@ -827,14 +828,15 @@ await newMessage.edit(
 playerTimers.set(message.author.id, nextTurnTimer);
 
 return;
+}
 
 await timerMessage.edit(
   `<@${message.author.id}> type a word containing: **${newCombo}**\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
 );
 
-  }, 1000);
+}, 1000);
 
-  playerTimers.set(message.author.id, turnTimer);
+playerTimers.set(message.author.id, turnTimer);
 
 } catch {
   await message.reply("dictionary check failed");
@@ -844,6 +846,7 @@ await timerMessage.edit(
 }
 }
 
+if (!message.mentions.has(client.user)) return;          
 try {
   const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",

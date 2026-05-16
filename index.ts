@@ -97,10 +97,11 @@ if (interaction.commandName === "whisper") {
   const text =
     interaction.options.getString("text");
 
-  await interaction.reply({
-    content: "message sent",
+  await interaction.deferReply({
     ephemeral: true
   });
+
+  await interaction.deleteReply();
 
   await interaction.channel.send(text);
 }

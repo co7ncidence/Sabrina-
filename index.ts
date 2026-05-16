@@ -202,8 +202,8 @@ if (interaction.commandName === "whisper") {
     ]
   });
 }
-
-client.on("messageDelete", async (message) => {no
+});
+client.on("messageDelete", async (message) => {
   if (!message.guild) return;
   if (message.author?.bot) return;
 

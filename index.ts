@@ -439,13 +439,14 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
   
-const content = message.content.toLowerCase();
+const content = message.content;
+const lowered = content.toLowerCase();
 
-  if (
-  content.startsWith("!") &&
-  content !== "!blacktea" &&
-  content !== "!coinflip" &&
-  !content.startsWith("!blacktea lives")
+if (
+  lowered.startsWith("!") &&
+  lowered !== "!blacktea" &&
+  lowered !== "!coinflip" &&
+  !lowered.startsWith("!blacktea lives")
 ) return;
 
 
@@ -477,7 +478,7 @@ if (content.startsWith("!blacktea lives")) {
   return;
 }
 
-if (content === "!blacktea") {
+if (lowered === "!blacktea") {
   const combos = [
   "ple", "str", "cha", "ing", "ous",
   "ter", "mon", "ack", "ash", "ice",
@@ -605,7 +606,7 @@ const currentPlayer =
 if (message.author.id !== currentPlayer.id) {
   return;
 }
-  const word = content;
+  const word = lowered;
 
  if (!word.includes(game.combo)) {
   await message.react("❌");
@@ -613,16 +614,21 @@ if (message.author.id !== currentPlayer.id) {
 }
 
 try {
+
+  console.log("checking word:", word);
+
   const res = await fetch(
     `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
   );
 
-  if (!res.ok) {
-  await message.react("❌");
-  return;
-}
+  console.log("status:", res.status);
 
-await message.react("✅");
+  if (!res.ok) {
+    await message.react("❌");
+    return;
+  }
+
+  await message.react("✅");
 
 const existingTimer = playerTimers.get(message.channel.id);
 
@@ -727,7 +733,8 @@ playerTimers.set(
   message.channel.id,
   turnTimer
 );
-} catch {
+} catch (err) {
+  console.error(err);
   await message.reply("dictionary check failed");
 }
 

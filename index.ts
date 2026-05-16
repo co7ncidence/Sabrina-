@@ -92,15 +92,17 @@ client.once("ready", () => {
   if (!interaction.isChatInputCommand()) return;
 
   // whisper
-// whisper
 if (interaction.commandName === "whisper") {
 
   const text =
     interaction.options.getString("text");
 
   await interaction.reply({
-    content: text
+    content: "message sent",
+    ephemeral: true
   });
+
+  await interaction.channel.send(text);
 }
 
   // snipe
@@ -160,7 +162,6 @@ if (interaction.commandName === "whisper") {
     );
   }
 
-  // dirtytalk
   // dirtytalk
 if (interaction.commandName === "dirtytalk") {
 

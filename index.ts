@@ -433,7 +433,7 @@ client.on("messageDelete", async (message) => {
   time: Date.now()
 });
 });
-client.removeAllListeners("messageCreate");
+
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
@@ -842,10 +842,9 @@ playerTimers.set(message.author.id, turnTimer);
   await message.reply("dictionary check failed");
 }
 
-  return;
+return;
 }
-}  
-          
+
 if (!message.mentions.has(client.user)) return;          
 try {
   const response = await fetch(

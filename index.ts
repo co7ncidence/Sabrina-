@@ -210,7 +210,7 @@ if (interaction.commandName === "dirtytalk") {
 
 > ${randomLine}
 
-♡ sent to ${user}`,
+📞 sent to ${user}`,
 
       fields: [
         {

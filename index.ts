@@ -845,7 +845,7 @@ playerTimers.set(message.author.id, turnTimer);
   return;
 }
 }
-
+}          
 if (!message.mentions.has(client.user)) return;          
 try {
   const response = await fetch(

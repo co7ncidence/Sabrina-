@@ -615,6 +615,60 @@ if (
   word.length < game.combo.length + 1
 ) {
   await message.react("❌");
+
+  const existingTimer =
+    playerTimers.get(message.channel.id);
+
+  if (existingTimer) {
+    clearInterval(existingTimer);
+  }
+
+  let retryTime = 10;
+
+  const retryMessage = await message.channel.send(
+    `❌ wrong word\n⏰ <@${currentPlayer.id}> has **10** seconds left`
+  );
+
+  const retryInterval = setInterval(async () => {
+
+    retryTime--;
+
+    if (retryTime <= 0) {
+
+      clearInterval(retryInterval);
+
+      game.lives[currentPlayer.id]--;
+
+      if (game.lives[currentPlayer.id] <= 0) {
+
+        await message.channel.send(
+          `💀 <@${currentPlayer.id}> is out`
+        );
+
+        game.players =
+          game.players.filter(
+            p => p.id !== currentPlayer.id
+          );
+
+        delete game.lives[currentPlayer.id];
+      }
+
+      return;
+    }
+
+    try {
+      await retryMessage.edit(
+        `❌ wrong word\n⏰ <@${currentPlayer.id}> has **${retryTime}** seconds left`
+      );
+    } catch {}
+
+  }, 1000);
+
+  playerTimers.set(
+    message.channel.id,
+    retryInterval
+  );
+
   return;
 }
 

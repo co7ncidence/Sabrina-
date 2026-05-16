@@ -717,11 +717,9 @@ const turnTimer = setTimeout(async () => {
 
   currentGame.combo = nextCombo;
 
-  await message.channel.send(
+    await message.channel.send(
     `<@${nextPlayer.id}> type a word containing: **${nextCombo}**`
   );
-  
-}); // closes setTimeout callback
 
 }, 10000);
 

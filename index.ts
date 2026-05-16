@@ -693,24 +693,24 @@ const turnTimer = setTimeout(async () => {
 
   } else {
 
-    await message.channel.send(
-      `⏰ <@${timedOutPlayer.id}> lost a life\nlives left: ${currentGame.lives[timedOutPlayer.id]}`
-    );
+  await message.channel.send(
+    `⏰ <@${timedOutPlayer.id}> lost a life\nlives left: ${currentGame.lives[timedOutPlayer.id]}`
+  );
 
-    currentGame.turnIndex =
-  (currentGame.turnIndex + 1) %
-  currentGame.players.length;
+  currentGame.turnIndex =
+    (currentGame.turnIndex + 1) %
+    currentGame.players.length;
 
-    if (
-      currentGame.turnIndex >=
-      currentGame.players.length
-    ) {
-      currentGame.turnIndex = 0;
-    }
+  if (
+    currentGame.turnIndex >=
+    currentGame.players.length
+  ) {
+    currentGame.turnIndex = 0;
   }
+}
 
-  const nextPlayer =
-    currentGame.players[currentGame.turnIndex];
+const nextPlayer =
+  currentGame.players[currentGame.turnIndex];
 
   const nextCombo =
     combos[Math.floor(Math.random() * combos.length)];

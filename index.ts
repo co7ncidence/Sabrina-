@@ -26,19 +26,37 @@ const commands = [
       PermissionFlagsBits.ManageMessages
     ),
 
-new SlashCommandBuilder()
-  .setName("snipe")
-  .setDescription("show the last deleted message"),
+  new SlashCommandBuilder()
+    .setName("snipe")
+    .setDescription("show the last deleted message"),
 
-new SlashCommandBuilder()
-  .setName("ship")
-  .setDescription("ship two people together")
-  .addUserOption(option =>
-    option
-      .setName("user1")
-      .setDescription("first person")
-      .setRequired(true)
-  )
+  new SlashCommandBuilder()
+    .setName("ship")
+    .setDescription("ship two people together")
+    .addUserOption(option =>
+      option
+        .setName("user1")
+        .setDescription("first person")
+        .setRequired(true)
+    )
+    .addUserOption(option =>
+      option
+        .setName("user2")
+        .setDescription("second person")
+        .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName("dirtytalk")
+    .setDescription("sabrina sends a flirty message")
+    .addUserOption(option =>
+      option
+        .setName("user")
+        .setDescription("who sabrina flirts with")
+        .setRequired(true)
+    )
+
+].map(command => command.toJSON());
   .addUserOption(option =>
     option
       .setName("user2")
@@ -140,6 +158,37 @@ if (interaction.commandName === "ship") {
     shipMessage =
       "actually soulmates";
   }
+
+  await interaction.reply(
+    `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`
+  );
+}
+
+if (interaction.commandName === "dirtytalk") {
+
+  const user =
+    interaction.options.getUser("user");
+
+  const lines = [
+    "come here pretty boy",
+    "you look easy to manipulate",
+    "lowkey wanna ruin your life a little",
+    "ur one dm away from making bad decisions",
+    "you look like you text back instantly",
+    "i could flirt with you for 5 minutes and you'd fold",
+    "you seem dangerously attention deprived",
+    "you look like you'd get attached fast",
+    "i just know ur obsessed with me already",
+    "you'd absolutely lose an argument to me"
+  ];
+
+  const randomLine =
+    lines[Math.floor(Math.random() * lines.length)];
+
+  await interaction.reply(
+    `💋 ${user}\n${randomLine}`
+  );
+}
 
   await interaction.reply(
     `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`

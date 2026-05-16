@@ -813,11 +813,14 @@ const nextTurnTimer = setInterval(async () => {
 
   }, 1000);
 
-  playerTimers.set(message.author.id, continuedInterval);   
+  playerTimers.set(message.author.id, continuedInterval);
 
-  await newMessage.edit(
-    `<@${message.author.id}> type a word containing: **${nextCombo}**\n${newTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
-  );
+return;
+}
+
+await newMessage.edit(
+  `<@${message.author.id}> type a word containing: **${nextCombo}**\n${newTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
+);
 
 }, 1000);
 

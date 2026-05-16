@@ -584,8 +584,47 @@ blackteaGames.set(message.channel.id, {
   )
 });
 
-await message.channel.send(
-  `<@${playerArray[0].id}> type a word containing: **${firstCombo}**`
+const firstPlayer = playerArray[0];
+
+const timerMessage = await message.channel.send(
+  `⏰ <@${firstPlayer.id}> has **10** seconds\nword: **${firstCombo}**`
+);
+
+let timeLeft = 10;
+
+const interval = setInterval(async () => {
+
+  timeLeft--;
+
+  if (timeLeft <= 0) {
+
+    clearInterval(interval);
+
+    const currentGame =
+      blackteaGames.get(message.channel.id);
+
+    if (!currentGame) return;
+
+    currentGame.lives[firstPlayer.id]--;
+
+    await message.channel.send(
+      `⏰ <@${firstPlayer.id}> lost a life\nlives left: ${currentGame.lives[firstPlayer.id]}`
+    );
+
+    return;
+  }
+
+  try {
+    await timerMessage.edit(
+      `⏰ <@${firstPlayer.id}> has **${timeLeft}** seconds\nword: **${firstCombo}**`
+    );
+  } catch {}
+
+}, 1000);
+
+playerTimers.set(
+  message.channel.id,
+  interval
 );      
     }
 
@@ -615,46 +654,8 @@ if (
   word.length < game.combo.length + 1
 ) {
   await message.react("❌");
-
-  const existingTimer =
-    playerTimers.get(message.channel.id);
-
-  if (existingTimer) {
-    clearInterval(existingTimer);
-  }
-
-  let retryTime = 10;
-
-  const retryMessage = await message.channel.send(
-    `❌ wrong word\n⏰ <@${currentPlayer.id}> has **10** seconds left`
-  );
-
-  const retryInterval = setInterval(async () => {
-
-    retryTime--;
-
-    if (retryTime <= 0) {
-
-      clearInterval(retryInterval);
-
-      game.lives[currentPlayer.id]--;
-
-      if (game.lives[currentPlayer.id] <= 0) {
-
-        await message.channel.send(
-          `💀 <@${currentPlayer.id}> is out`
-        );
-
-        game.players =
-          game.players.filter(
-            p => p.id !== currentPlayer.id
-          );
-
-        delete game.lives[currentPlayer.id];
-      }
-
-      return;
-    }
+  return;
+}
 
     try {
       await retryMessage.edit(

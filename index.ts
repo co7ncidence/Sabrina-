@@ -828,10 +828,7 @@ playerTimers.set(message.author.id, nextTurnTimer);
 
 return;
 
-      return;
-    }
-
-    await timerMessage.edit(
+await timerMessage.edit(
   `<@${message.author.id}> type a word containing: **${newCombo}**\n${timer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
 );
 

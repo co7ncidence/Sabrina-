@@ -102,8 +102,24 @@ if (interaction.commandName === "whisper") {
   });
 
   await interaction.channel?.send({
-    content: `💌 ${text}`
-  });
+  embeds: [
+    {
+      color: 0xff0033,
+
+      author: {
+        name: "☎️ sabrina hotline"
+      },
+
+      description: `> ${text}`,
+
+      footer: {
+        text: "anonymous caller"
+      },
+
+      timestamp: new Date().toISOString()
+    }
+  ]
+});
 
   await interaction.deleteReply();
 }

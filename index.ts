@@ -711,7 +711,6 @@ await message.channel.send(
 );
 
 const newMessage = await message.channel.send(
- const res = await fetch( 
   `<@${message.author.id}> type a word containing: **${nextCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
 );
 

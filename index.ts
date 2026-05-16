@@ -197,36 +197,42 @@ if (interaction.commandName === "dirtytalk") {
   await interaction.deleteReply();
 
   await interaction.channel.send({
+  embeds: [
+    {
+      color: randomColor,
 
-    embeds: [
+      author: {
+        name: "☎ SABRINA HOTLINE"
+      },
 
-      {
+      description:
+`## incoming call...
 
-        color: 0xff2d8d,
+> ${randomLine}
 
-        author: {
+♡ sent to ${user}`,
 
-          name: "☎️ sabrina hotline"
-
+      fields: [
+        {
+          name: "caller id",
+          value: "unknown",
+          inline: true
         },
+        {
+          name: "line",
+          value: "private",
+          inline: true
+        }
+      ],
 
-        description:
+      footer: {
+        text: "call may be monitored"
+      },
 
-          `💋 ${user}\n\n> ${randomLine}`,
-
-        footer: {
-
-          text: "anonymous operator"
-
-        },
-
-        timestamp: new Date().toISOString()
-
-      }
-
-    ]
-
-  });
+      timestamp: new Date().toISOString()
+    }
+  ]
+});
 
 }
     

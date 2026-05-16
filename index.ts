@@ -717,7 +717,7 @@ const turnTimer = setTimeout(async () => {
 
   currentGame.combo = nextCombo;
 
-    await message.channel.send(
+      await message.channel.send(
     `<@${nextPlayer.id}> type a word containing: **${nextCombo}**`
   );
 
@@ -732,9 +732,13 @@ playerTimers.set(
 }
 
 return;
-}
+});
 
-if (!message.mentions.has(client.user)) return;          
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
+if (message.author.id === client.user?.id) return;
+if (!message.mentions.has(client.user)) return;
+      
 try {
   const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",

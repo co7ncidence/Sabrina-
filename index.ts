@@ -97,31 +97,9 @@ if (interaction.commandName === "whisper") {
   const text =
     interaction.options.getString("text");
 
-  await interaction.deferReply({
-    ephemeral: true
+  await interaction.reply({
+    content: text
   });
-
-  await interaction.channel?.send({
-  embeds: [
-    {
-      color: 0xff0033,
-
-      author: {
-        name: "☎️ sabrina hotline"
-      },
-
-      description: `> ${text}`,
-
-      footer: {
-        text: "anonymous caller"
-      },
-
-      timestamp: new Date().toISOString()
-    }
-  ]
-});
-
-  await interaction.deleteReply();
 }
 
   // snipe
@@ -184,30 +162,46 @@ if (interaction.commandName === "whisper") {
   // dirtytalk
   if (interaction.commandName === "dirtytalk") {
 
-    const user =
-      interaction.options.getUser("user");
+  const user =
+    interaction.options.getUser("user");
 
-    const lines = [
-      "come here pretty boy",
-      "you look easy to manipulate",
-      "lowkey wanna ruin your life a little",
-      "ur one dm away from making bad decisions",
-      "you look like you text back instantly",
-      "i could flirt with you for 5 minutes and you'd fold",
-      "you seem dangerously attention deprived",
-      "you look like you'd get attached fast",
-      "i just know ur obsessed with me already",
-      "you'd absolutely lose an argument to me"
-    ];
+  const lines = [
+    "come here pretty boy",
+    "you look easy to manipulate",
+    "lowkey wanna ruin your life a little",
+    "ur one dm away from making bad decisions",
+    "you look like you text back instantly",
+    "i could flirt with you for 5 minutes and you'd fold",
+    "you seem dangerously attention deprived",
+    "you look like you'd get attached fast",
+    "i just know ur obsessed with me already",
+    "you'd absolutely lose an argument to me"
+  ];
 
-    const randomLine =
-      lines[Math.floor(Math.random() * lines.length)];
+  const randomLine =
+    lines[Math.floor(Math.random() * lines.length)];
 
-    await interaction.reply(
-      `💋 ${user}\n${randomLine}`
-    );
-    }
-});
+  await interaction.reply({
+    embeds: [
+      {
+        color: 0xff2d8d,
+
+        author: {
+          name: "☎️ sabrina hotline"
+        },
+
+        description:
+          `💋 ${user}\n\n> ${randomLine}`,
+
+        footer: {
+          text: "anonymous operator"
+        },
+
+        timestamp: new Date().toISOString()
+      }
+    ]
+  });
+}
 
 client.on("messageDelete", async (message) => {no
   if (!message.guild) return;

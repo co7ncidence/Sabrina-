@@ -57,14 +57,7 @@ const commands = [
     )
 
 ].map(command => command.toJSON());
-  .addUserOption(option =>
-    option
-      .setName("user2")
-      .setDescription("second person")
-      .setRequired(true)
-  )
-
-].map(command => command.toJSON());
+  
 
 app.get("/", (_, res) => {
   res.send("Bot is running");

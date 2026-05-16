@@ -93,17 +93,19 @@ client.once("ready", () => {
 
   // whisper
 if (interaction.commandName === "whisper") {
+
   const text =
     interaction.options.getString("text");
 
-  await interaction.reply({
-    content: "anonymous message sent",
+  await interaction.deferReply({
     ephemeral: true
   });
 
   await interaction.channel?.send({
     content: `💌 ${text}`
   });
+
+  await interaction.deleteReply();
 }
 
   // snipe

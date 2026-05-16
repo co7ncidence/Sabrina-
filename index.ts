@@ -807,17 +807,13 @@ const nextTurnTimer = setInterval(async () => {
   // you'd ideally restart another timer here
   return;
 }
-
-    await continuedMessage.edit(
+     await continuedMessage.edit(
       `<@${message.author.id}> type a word containing: **${anotherCombo}**\n${continuedTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`
     );
 
   }, 1000);
 
-  playerTimers.set(message.author.id, continuedInterval);
-
-  return;
-}
+  playerTimers.set(message.author.id, continuedInterval);   
 
   await newMessage.edit(
     `<@${message.author.id}> type a word containing: **${nextCombo}**\n${newTimer}s left\nlives: ${"♥️".repeat(activeGame.lives)}`

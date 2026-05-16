@@ -186,15 +186,10 @@ client.once("ready", () => {
     await interaction.reply(
       `💋 ${user}\n${randomLine}`
     );
-  }
+    }
 });
 
-  await interaction.reply(
-    `💘 **${user1.username}** + **${user2.username}**\n${percent}% compatible\n${shipMessage}`
-  );
-}    
-});
-client.on("messageDelete", async (message) => {
+client.on("messageDelete", async (message) => {no
   if (!message.guild) return;
   if (message.author?.bot) return;
 

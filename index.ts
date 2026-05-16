@@ -185,28 +185,49 @@ if (interaction.commandName === "dirtytalk") {
   ];
 
   const randomLine =
+
     lines[Math.floor(Math.random() * lines.length)];
 
-  await interaction.reply({
+  await interaction.deferReply({
+
+    ephemeral: true
+
+  });
+
+  await interaction.deleteReply();
+
+  await interaction.channel.send({
+
     embeds: [
+
       {
+
         color: 0xff2d8d,
 
         author: {
+
           name: "☎️ sabrina hotline"
+
         },
 
         description:
+
           `💋 ${user}\n\n> ${randomLine}`,
 
         footer: {
+
           text: "anonymous operator"
+
         },
 
         timestamp: new Date().toISOString()
+
       }
+
     ]
+
   });
+
 }
     
 });

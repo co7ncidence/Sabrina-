@@ -92,6 +92,7 @@ client.once("ready", () => {
   if (!interaction.isChatInputCommand()) return;
 
   // whisper
+// whisper
 if (interaction.commandName === "whisper") {
 
   const text =
@@ -160,7 +161,8 @@ if (interaction.commandName === "whisper") {
   }
 
   // dirtytalk
-  if (interaction.commandName === "dirtytalk") {
+  // dirtytalk
+if (interaction.commandName === "dirtytalk") {
 
   const user =
     interaction.options.getUser("user");
@@ -202,6 +204,7 @@ if (interaction.commandName === "whisper") {
     ]
   });
 }
+    
 });
 client.on("messageDelete", async (message) => {
   if (!message.guild) return;

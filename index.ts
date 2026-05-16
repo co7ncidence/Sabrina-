@@ -7,6 +7,24 @@ import {
   SlashCommandBuilder,
   PermissionFlagsBits
 } from "discord.js";
+import fs from "fs";
+
+const marriagesFile = "./marriages.json";
+
+let marriages = {};
+
+if (fs.existsSync(marriagesFile)) {
+  marriages = JSON.parse(
+    fs.readFileSync(marriagesFile, "utf8")
+  );
+}
+
+function saveMarriages() {
+  fs.writeFileSync(
+    marriagesFile,
+    JSON.stringify(marriages, null, 2)
+  );
+}
 const app = express();
 const activeGames = new Map();
 const playerTimers = new Map();
@@ -50,11 +68,38 @@ const commands = [
     .setName("dirtytalk")
     .setDescription("sabrina sends a flirty message")
     .addUserOption(option =>
-      option
-        .setName("user")
-        .setDescription("who sabrina flirts with")
-        .setRequired(true)
-    )
+  option
+    .setName("user")
+    .setDescription("who sabrina flirts with")
+    .setRequired(true)
+),
+ new SlashCommandBuilder()
+  .setName("marry")
+  .setDescription("marry someone")
+  .addUserOption(option =>
+    option
+      .setName("user")
+      .setDescription("who to marry")
+      .setRequired(true)
+  ),
+
+new SlashCommandBuilder()
+  .setName("divorce")
+  .setDescription("divorce your partner"),
+
+new SlashCommandBuilder()
+  .setName("date")
+  .setDescription("see your relationship"),
+
+new SlashCommandBuilder()
+  .setName("cheat")
+  .setDescription("cheat on your partner")
+  .addUserOption(option =>
+    option
+      .setName("user")
+      .setDescription("side piece")
+      .setRequired(true)
+  ), 
 
 ].map(command => command.toJSON());
   
@@ -185,58 +230,198 @@ if (interaction.commandName === "dirtytalk") {
   ];
 
   const randomLine =
-
     lines[Math.floor(Math.random() * lines.length)];
 
   await interaction.deferReply({
-
     ephemeral: true
-
   });
 
   await interaction.deleteReply();
 
   await interaction.channel.send({
-  embeds: [
-    {
-      color: 0xff2d8d,
+    embeds: [
+      {
+        color: 0xff2d8d,
 
-      author: {
-        name: "☎ SABRINA HOTLINE"
-      },
+        author: {
+          name: "☎ SABRINA HOTLINE"
+        },
 
-      description:
+        description:
 `## incoming call...
 
 > ${randomLine}
 
 📞 sent to ${user}`,
 
-      fields: [
-        {
-          name: "caller id",
-          value: "unknown",
-          inline: true
+        fields: [
+          {
+            name: "caller id",
+            value: "unknown",
+            inline: true
+          },
+          {
+            name: "line",
+            value: "private",
+            inline: true
+          }
+        ],
+
+        footer: {
+          text: "call may be monitored"
         },
-        {
-          name: "line",
-          value: "private",
-          inline: true
-        }
-      ],
 
-      footer: {
-        text: "call may be monitored"
-      },
-
-      timestamp: new Date().toISOString()
-    }
-  ]
-});
-
+        timestamp: new Date().toISOString()
+      }
+    ]
+  });
 }
-    
-});
+if (interaction.commandName === "marry") {
+
+  const user =
+    interaction.options.getUser("user");
+
+  if (user.id === interaction.user.id) {
+    await interaction.reply(
+      "you cannot marry yourself dumbass"
+    );
+    return;
+  }
+
+  if (marriages[interaction.user.id]) {
+    await interaction.reply(
+      "you're already married"
+    );
+    return;
+  }
+
+  if (marriages[user.id]) {
+    await interaction.reply(
+      "they're already married"
+    );
+    return;
+  }
+
+  marriages[interaction.user.id] = {
+    partner: user.id,
+    since: Date.now()
+  };
+
+  marriages[user.id] = {
+    partner: interaction.user.id,
+    since: Date.now()
+  };
+
+  saveMarriages();
+
+  await interaction.reply(
+    `💍 ${interaction.user} married ${user}`
+  );
+}
+if (interaction.commandName === "date") {
+
+  const marriage =
+    marriages[interaction.user.id];
+
+  if (!marriage) {
+    await interaction.reply(
+      "you're single"
+    );
+    return;
+  }
+
+  const partner =
+    await client.users.fetch(
+      marriage.partner
+    );
+
+  const days =
+    Math.floor(
+      (Date.now() - marriage.since) /
+      (1000 * 60 * 60 * 24)
+    );
+
+  await interaction.reply({
+    embeds: [
+      {
+        color: 0xff2d8d,
+
+        author: {
+          name: "♡ relationship status"
+        },
+
+        description:
+`💍 married to ${partner}
+
+♡ together for ${days} day(s)`,
+
+        footer: {
+  text: "true love or stockholm syndrome"
+}
+      }
+    ]
+  });
+}   
+if (interaction.commandName === "divorce") {
+
+  const marriage =
+    marriages[interaction.user.id];
+
+  if (!marriage) {
+    await interaction.reply(
+      "you're not married"
+    );
+    return;
+  }
+
+  const partnerId = marriage.partner;
+
+  delete marriages[interaction.user.id];
+  delete marriages[partnerId];
+
+  saveMarriages();
+
+  await interaction.reply(
+    "💔 divorce finalized"
+  );
+}  
+if (interaction.commandName === "cheat") {
+
+  const sideUser =
+    interaction.options.getUser("user");
+
+  const marriage =
+    marriages[interaction.user.id];
+
+  if (!marriage) {
+    await interaction.reply(
+      "you need a relationship to ruin first"
+    );
+    return;
+  }
+
+  const caught =
+    Math.random() < 0.5;
+
+  if (caught) {
+
+    const partner =
+      await client.users.fetch(
+        marriage.partner
+      );
+
+    await interaction.reply(
+      `🚨 ${partner} caught you cheating with ${sideUser}`
+    );
+
+    } else {
+
+    await interaction.reply(
+      `🤫 nobody found out about you and ${sideUser}`
+    );
+  }
+}
+});  
 client.on("messageDelete", async (message) => {
   if (!message.guild) return;
   if (message.author?.bot) return;
@@ -416,8 +601,6 @@ return;
 const activeGame = activeGames.get(message.author.id);
 
 if (activeGame?.active) {
-
-if (activeGame) {
   
   const word = content;
 
@@ -528,6 +711,7 @@ await message.channel.send(
 );
 
 const newMessage = await message.channel.send(
+ const res = await fetch( 
   `<@${message.author.id}> type a word containing: **${nextCombo}**\n10s left\nlives: ${"♥️".repeat(activeGame.lives)}`
 );
 

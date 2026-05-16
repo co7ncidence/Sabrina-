@@ -170,16 +170,18 @@ if (interaction.commandName === "dirtytalk") {
     interaction.options.getUser("user");
 
   const lines = [
-    "come here pretty boy",
-    "you look easy to manipulate",
+    "come here you",
+    "I want to fuck you all night",
     "lowkey wanna ruin your life a little",
-    "ur one dm away from making bad decisions",
-    "you look like you text back instantly",
-    "i could flirt with you for 5 minutes and you'd fold",
-    "you seem dangerously attention deprived",
-    "you look like you'd get attached fast",
-    "i just know ur obsessed with me already",
-    "you'd absolutely lose an argument to me"
+    "Take off all your clothes",
+    "Fries bussin 💦💦💦",
+    "last night was a movie 😫",
+    "Me + you = 🍆🍑",
+    "You're my cum slut for the day",
+    "lemme syd",
+    "I'm going to eyp",
+    "Cum forth 👀👀",
+    "Fatass nigga"
   ];
 
   const randomLine =

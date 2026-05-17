@@ -48,23 +48,27 @@ async function getMarriage(userId) {
 
 async function setMarriage(userId, data) {
 
-  const { error } = await supabase
-  .from("marriages")
-  .upsert(
-    {
-      userId: userId,
-      partner: data.partner,
-      since: data.since,
-      kids: data.kids || []
-    },
-    {
-      onConflict: "userid"
-    }
-  );
+  console.log("TRYING TO SAVE:", {
+    userId,
+    partner: data.partner
+  });
 
-  if (error) {
-    console.error("SUPABASE SAVE ERROR:", error);
-  }
+  const result = await supabase
+    .from("marriages")
+    .upsert(
+      {
+        userId: userId,
+        partner: data.partner,
+        since: data.since,
+        kids: data.kids || []
+      },
+      {
+        onConflict: "userId"
+      }
+    )
+    .select();
+
+  console.log("SUPABASE RESULT:", result);
 }
 
 async function deleteMarriage(userId) {

@@ -615,77 +615,94 @@ if (interaction.commandName === "cheat") {
           .setStyle(ButtonStyle.Secondary)
       );
 
-  await interaction.reply({
-    content:
-`How do you cover it up?`,
-    components: [buttons],
-    ephemeral: true
-  });
+  await interaction.deferReply({
+  ephemeral: true
+});
+
+await interaction.editReply({
+  content: `How do you cover it up?`,
+  components: [buttons]
+});
 
   try {
 
     const reply =
   await interaction.fetchReply();
 
-const buttonInteraction =
-  await reply.awaitMessageComponent({
+const collector =
+  reply.createMessageComponentCollector({
     componentType: ComponentType.Button,
-    time: 30000,
-    filter: i =>
-      i.user.id === interaction.user.id
+    time: 30000
   });
 
-    const choice =
-      buttonInteraction.customId;
+collector.on("collect", async (buttonInteraction) => {
 
-    const caught =
-      badOptions.includes(choice);
+  if (
+    buttonInteraction.user.id !== interaction.user.id
+  ) {
+    await buttonInteraction.reply({
+      content: "not your affair",
+      ephemeral: true
+    });
+    return;
+  }
 
-    if (caught) {
+  const choice =
+    buttonInteraction.customId;
 
-      await buttonInteraction.update({
-        content:
-          `you chose: **${choice}**\n\nyou got caught 💀`,
-        components: []
-      });
+  const caught =
+    badOptions.includes(choice);
 
-      await interaction.channel.send(
-        `🚨 ${partner} caught ${interaction.user} cheating with ${sideUser}`
-      );
+  if (caught) {
 
-      await partner.send(
-        `🚨 your partner ${interaction.user} had an affair with ${sideUser}`
-      ).catch(() => null);
+    await buttonInteraction.update({
+      content:
+        `you chose: **${choice}**\n\nyou got caught 💀`,
+      components: []
+    });
 
-    } else {
+    await interaction.channel.send(
+      `🚨 ${partner} caught ${interaction.user} cheating with ${sideUser}`
+    );
 
-      await buttonInteraction.update({
-        content:
-          `you chose: **${choice}**\n\nnobody found out 🤫`,
-        components: []
-      });
+    await partner.send(
+      `🚨 your partner ${interaction.user} had an affair with ${sideUser}`
+    ).catch(() => null);
 
-      const secretMessage =
-        `🤫 nobody found out about you and ${sideUser}`;
+  } else {
 
-      await interaction.user.send(
-        secretMessage
-      ).catch(() => null);
+    await buttonInteraction.update({
+      content:
+        `you chose: **${choice}**\n\nnobody found out 🤫`,
+      components: []
+    });
 
-      await sideUser.send(
-        secretMessage
-      ).catch(() => null);
-    }
+    const secretMessage =
+      `🤫 nobody found out about you and ${sideUser}`;
 
-  } catch {
+    await interaction.user.send(
+      secretMessage
+    ).catch(() => null);
+
+    await sideUser.send(
+      secretMessage
+    ).catch(() => null);
+  }
+
+  collector.stop();
+});
+
+collector.on("end", async (_, reason) => {
+
+  if (reason === "time") {
 
     await interaction.editReply({
       content:
         "too slow. the affair window closed",
       components: []
-    });
+    }).catch(() => null);
   }
-}
+});
 if (interaction.commandName === "adopt") {
 
   const child =

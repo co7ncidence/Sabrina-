@@ -624,13 +624,16 @@ if (interaction.commandName === "cheat") {
 
   try {
 
-    const buttonInteraction =
-      await interaction.awaitMessageComponent({
-        componentType: ComponentType.Button,
-        time: 30000,
-        filter: i =>
-          i.user.id === interaction.user.id
-      });
+    const reply =
+  await interaction.fetchReply();
+
+const buttonInteraction =
+  await reply.awaitMessageComponent({
+    componentType: ComponentType.Button,
+    time: 30000,
+    filter: i =>
+      i.user.id === interaction.user.id
+  });
 
     const choice =
       buttonInteraction.customId;

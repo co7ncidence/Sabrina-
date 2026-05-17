@@ -7,29 +7,69 @@ import {
   SlashCommandBuilder,
   PermissionFlagsBits
 } from "discord.js";
-import fs from "fs";
+import Database from "better-sqlite3";
 process.on("unhandledRejection", console.error);
 process.on("uncaughtException", console.error);
-const marriagesFile = "./marriages.json";
+const db = new Database("database.db");
+if (!process.env.DISCORD_TOKEN) {
+  throw new Error("Missing DISCORD_TOKEN");
+}
 
-let marriages = {};
+if (!process.env.CLIENT_ID) {
+  throw new Error("Missing CLIENT_ID");
+}
 
-if (fs.existsSync(marriagesFile)) {
-  marriages = JSON.parse(
-    fs.readFileSync(marriagesFile, "utf8")
+if (!process.env.OPENROUTER_API_KEY) {
+  throw new Error("Missing OPENROUTER_API_KEY");
+}
+db.prepare(`
+CREATE TABLE IF NOT EXISTS marriages (
+  userId TEXT PRIMARY KEY,
+  partner TEXT NOT NULL,
+  since INTEGER NOT NULL,
+  kids TEXT NOT NULL
+)
+`).run();
+function getMarriage(userId) {
+  const row = db
+    .prepare(
+      "SELECT * FROM marriages WHERE userId = ?"
+    )
+    .get(userId);
+
+  if (!row) return null;
+
+  return {
+    partner: row.partner,
+    since: row.since,
+    kids: JSON.parse(row.kids)
+  };
+}
+
+function setMarriage(userId, data) {
+  db.prepare(`
+    INSERT OR REPLACE INTO marriages
+    (userId, partner, since, kids)
+    VALUES (?, ?, ?, ?)
+  `).run(
+    userId,
+    data.partner,
+    data.since,
+    JSON.stringify(data.kids || [])
   );
 }
 
-function saveMarriages() {
-  fs.writeFileSync(
-    marriagesFile,
-    JSON.stringify(marriages, null, 2)
-  );
+function deleteMarriage(userId) {
+  db.prepare(
+    "DELETE FROM marriages WHERE userId = ?"
+  ).run(userId);
 }
+
 const app = express();
 const blackteaGames = new Map();
 const playerTimers = new Map();
 const snipes = new Map();
+const cooldowns = new Map();
 
 const combos = [
   "ple", "str", "cha", "ing", "ous",
@@ -197,7 +237,12 @@ if (interaction.commandName === "whisper") {
 
   await interaction.deleteReply();
 
-  await interaction.channel.send(text);
+  await interaction.channel.send({
+  content: text,
+  allowedMentions: {
+    parse: []
+  }
+});
 }
 
   // snipe
@@ -275,7 +320,7 @@ if (interaction.commandName === "dirtytalk") {
     "lemme syd",
     "I'm going to eyp",
     "Cum forth 👀👀",
-    "Fatass nigga"
+    "Fatass"
   ];
 
   const randomLine =
@@ -337,14 +382,14 @@ if (interaction.commandName === "propose") {
     return;
   }
 
-  if (marriages[interaction.user.id]) {
+  if (getMarriage(interaction.user.id)) {
     await interaction.reply(
       "you're already married"
     );
     return;
   }
 
-  if (marriages[user.id]) {
+  if (getMarriage(user.id)) {
     await interaction.reply(
       "they're already married"
     );
@@ -373,31 +418,34 @@ if (interaction.commandName === "propose") {
     .toLowerCase()
     .trim();
 
+if (response === "no" || response === "n") {
+  await interaction.channel.send(
+    `💔 ${user} rejected the proposal`
+  );
+  return;
+}
+
 if (
   response !== "yes" &&
   response !== "y"
 ) {
-
   await interaction.channel.send(
-    `💔 ${user} rejected the proposal`
+    "reply with yes or no"
   );
-
   return;
 }
 
-    marriages[interaction.user.id] = {
-      partner: user.id,
-      since: Date.now(),
-      kids: []
-    };
+    setMarriage(interaction.user.id, {
+  partner: user.id,
+  since: Date.now(),
+  kids: []
+});
 
-    marriages[user.id] = {
-      partner: interaction.user.id,
-      since: Date.now(),
-      kids: []
-    };
-
-    saveMarriages();
+setMarriage(user.id, {
+  partner: interaction.user.id,
+  since: Date.now(),
+  kids: []
+});
 
     await interaction.channel.send(
       `💍 ${interaction.user} and ${user} are now married`
@@ -413,7 +461,7 @@ if (
 if (interaction.commandName === "relationship") {
 
   const marriage =
-    marriages[interaction.user.id];
+    getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -423,10 +471,9 @@ if (interaction.commandName === "relationship") {
   }
 
   const partner =
-    await client.users.fetch(
-      marriage.partner
-    );
-
+  await client.users.fetch(
+    marriage.partner
+  ).catch(() => null);
   const days =
     Math.floor(
       (Date.now() - marriage.since) /
@@ -454,8 +501,8 @@ if (interaction.commandName === "relationship") {
           name: "♡ relationship status"
         },
 
-        description:
-`💍 married to ${partner}
+description:
+`💍 married to ${partner ? `<@${partner.id}>` : "unknown user"}
 
 ♡ together for ${days} day(s)
 
@@ -472,7 +519,7 @@ if (interaction.commandName === "relationship") {
 if (interaction.commandName === "divorce") {
 
   const marriage =
-    marriages[interaction.user.id];
+    getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -483,10 +530,9 @@ if (interaction.commandName === "divorce") {
 
   const partnerId = marriage.partner;
 
-  delete marriages[interaction.user.id];
-  delete marriages[partnerId];
+  deleteMarriage(interaction.user.id);
+deleteMarriage(partnerId);
 
-  saveMarriages();
 
   await interaction.reply(
     "💔 divorce finalized"
@@ -498,7 +544,7 @@ if (interaction.commandName === "cheat") {
     interaction.options.getUser("user");
 
   const marriage =
-    marriages[interaction.user.id];
+    getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -534,7 +580,7 @@ if (interaction.commandName === "adopt") {
     interaction.options.getUser("user");
 
   const marriage =
-    marriages[interaction.user.id];
+    getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -565,7 +611,7 @@ if (child.bot) {
   return;
 }
 
-if (child.id === partner.id) {
+if (child.id === partner.id){
   await interaction.reply(
     "you cannot adopt your partner 😭"
   );
@@ -578,12 +624,31 @@ if (marriage.kids.includes(child.id)) {
   );
   return;
 }
-  marriage.kids.push(child.id);
+marriage.kids.push(child.id);
 
-  marriages[partner.id].kids =
-    marriage.kids;
+setMarriage(interaction.user.id, {
+  partner: marriage.partner,
+  since: marriage.since,
+  kids: marriage.kids
+});
 
-  saveMarriages();
+const partnerMarriage =
+  getMarriage(marriage.partner);
+
+if (!partnerMarriage) {
+  await interaction.reply(
+    "partner data missing"
+  );
+  return;
+}
+
+partnerMarriage.kids = marriage.kids;
+
+setMarriage(marriage.partner, {
+  partner: partnerMarriage.partner,
+  since: partnerMarriage.since,
+  kids: partnerMarriage.kids
+});
 
   await interaction.reply(
     `👶 ${interaction.user} and ${partner} adopted ${child}`
@@ -592,7 +657,7 @@ if (marriage.kids.includes(child.id)) {
 if (interaction.commandName === "family") {
 
   const marriage =
-    marriages[interaction.user.id];
+  getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -602,10 +667,9 @@ if (interaction.commandName === "family") {
   }
 
   const partner =
-    await client.users.fetch(
-      marriage.partner
-    );
-
+  await client.users.fetch(
+    marriage.partner
+  ).catch(() => null);
   let kidsText = "none";
 
   if (
@@ -627,8 +691,8 @@ if (interaction.commandName === "family") {
           name: "♡ family"
         },
 
-        description:
-`💍 partner: ${partner}
+description:
+`💍 partner: ${partner ? `<@${partner.id}>` : "unknown user"}
 
 👶 children:
 ${kidsText}`
@@ -677,7 +741,10 @@ async function startTurn(channel, game) {
 
   return;
 }
-
+if (!game.players.length) {
+  blackteaGames.delete(channel.id);
+  return;
+}
   const player =
     game.players[game.turnIndex];
 
@@ -886,6 +953,10 @@ const game = blackteaGames.get(message.channel.id);
 
 if (game) {
 
+if (!game.players[game.turnIndex]) {
+  game.turnIndex = 0;
+}
+  
   const currentPlayer =
     game.players[game.turnIndex];
 
@@ -949,6 +1020,22 @@ if (game) {
 }
 if (!message.mentions.has(client.user)) return;
 
+const now = Date.now();
+
+if (cooldowns.has(message.author.id)) {
+  const expiration = cooldowns.get(message.author.id);
+
+  if (now < expiration) {
+    return;
+  }
+}
+
+cooldowns.set(message.author.id, now + 5000);
+
+setTimeout(() => {
+  cooldowns.delete(message.author.id);
+}, 5000);
+  
 try {
 
   const response = await fetch(

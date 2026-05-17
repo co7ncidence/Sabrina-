@@ -43,7 +43,8 @@ async function getMarriage(userId) {
 }
 
 async function setMarriage(userId, data) {
-  await supabase
+
+  const { error } = await supabase
     .from("marriages")
     .upsert({
       userId,
@@ -51,6 +52,10 @@ async function setMarriage(userId, data) {
       since: data.since,
       kids: data.kids || []
     });
+
+  if (error) {
+    console.error("SUPABASE SAVE ERROR:", error);
+  }
 }
 
 async function deleteMarriage(userId) {

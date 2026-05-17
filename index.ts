@@ -5,7 +5,11 @@ import {
   REST,
   Routes,
   SlashCommandBuilder,
-  PermissionFlagsBits
+  PermissionFlagsBits,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType
 } from "discord.js";
 import { createClient } from "@supabase/supabase-js";
 
@@ -552,34 +556,127 @@ if (interaction.commandName === "cheat") {
     interaction.options.getUser("user");
 
   const marriage =
-                await getMarriage(interaction.user.id);
+    await getMarriage(interaction.user.id);
 
   if (!marriage) {
-    await interaction.reply(
-      "you need a relationship to ruin first"
-    );
+    await interaction.reply({
+      content:
+        "you need a relationship to ruin first",
+      ephemeral: true
+    });
     return;
   }
 
-  const caught =
-    Math.random() < 0.5;
+  const partner =
+    await client.users.fetch(
+      marriage.partner
+    );
 
-  if (caught) {
+  const badOptions = [
+    "gaslight",
+    "deny it",
+    "lie",
+    "delete messages",
+    "blame friend"
+  ]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2);
 
-    const partner =
-      await client.users.fetch(
-        marriage.partner
+  const buttons =
+    new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId("delete messages")
+          .setLabel("delete messages")
+          .setStyle(ButtonStyle.Secondary),
+
+        new ButtonBuilder()
+          .setCustomId("lie")
+          .setLabel("lie")
+          .setStyle(ButtonStyle.Secondary),
+
+        new ButtonBuilder()
+          .setCustomId("gaslight")
+          .setLabel("gaslight")
+          .setStyle(ButtonStyle.Secondary),
+
+        new ButtonBuilder()
+          .setCustomId("blame friend")
+          .setLabel("blame friend")
+          .setStyle(ButtonStyle.Secondary),
+
+        new ButtonBuilder()
+          .setCustomId("deny it")
+          .setLabel("deny it")
+          .setStyle(ButtonStyle.Secondary)
       );
 
-    await interaction.reply(
-      `🚨 ${partner} caught you cheating with ${sideUser}`
-    );
+  await interaction.reply({
+    content:
+`How do you cover it up?`,
+    components: [buttons],
+    ephemeral: true
+  });
+
+  try {
+
+    const buttonInteraction =
+      await interaction.awaitMessageComponent({
+        componentType: ComponentType.Button,
+        time: 30000,
+        filter: i =>
+          i.user.id === interaction.user.id
+      });
+
+    const choice =
+      buttonInteraction.customId;
+
+    const caught =
+      badOptions.includes(choice);
+
+    if (caught) {
+
+      await buttonInteraction.update({
+        content:
+          `you chose: **${choice}**\n\nyou got caught 💀`,
+        components: []
+      });
+
+      await interaction.channel.send(
+        `🚨 ${partner} caught ${interaction.user} cheating with ${sideUser}`
+      );
+
+      await partner.send(
+        `🚨 your partner ${interaction.user} had an affair with ${sideUser}`
+      ).catch(() => null);
 
     } else {
 
-    await interaction.reply(
-      `🤫 nobody found out about you and ${sideUser}`
-    );
+      await buttonInteraction.update({
+        content:
+          `you chose: **${choice}**\n\nnobody found out 🤫`,
+        components: []
+      });
+
+      const secretMessage =
+        `🤫 nobody found out about you and ${sideUser}`;
+
+      await interaction.user.send(
+        secretMessage
+      ).catch(() => null);
+
+      await sideUser.send(
+        secretMessage
+      ).catch(() => null);
+    }
+
+  } catch {
+
+    await interaction.editReply({
+      content:
+        "too slow. the affair window closed",
+      components: []
+    });
   }
 }
 if (interaction.commandName === "adopt") {

@@ -7,10 +7,14 @@ import {
   SlashCommandBuilder,
   PermissionFlagsBits
 } from "discord.js";
-import Database from "better-sqlite3";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_KEY!
+);
 process.on("unhandledRejection", console.error);
 process.on("uncaughtException", console.error);
-const db = new Database("database.db");
 if (!process.env.DISCORD_TOKEN) {
   throw new Error("Missing DISCORD_TOKEN");
 }
@@ -22,47 +26,38 @@ if (!process.env.CLIENT_ID) {
 if (!process.env.OPENROUTER_API_KEY) {
   throw new Error("Missing OPENROUTER_API_KEY");
 }
-db.prepare(`
-CREATE TABLE IF NOT EXISTS marriages (
-  userId TEXT PRIMARY KEY,
-  partner TEXT NOT NULL,
-  since INTEGER NOT NULL,
-  kids TEXT NOT NULL
-)
-`).run();
-function getMarriage(userId) {
-  const row = db
-    .prepare(
-      "SELECT * FROM marriages WHERE userId = ?"
-    )
-    .get(userId);
+async function getMarriage(userId) {
+  const { data, error } = await supabase
+    .from("marriages")
+    .select("*")
+    .eq("userId", userId)
+    .single();
 
-  if (!row) return null;
+  if (error || !data) return null;
 
   return {
-    partner: row.partner,
-    since: row.since,
-    kids: JSON.parse(row.kids)
+    partner: data.partner,
+    since: data.since,
+    kids: data.kids || []
   };
 }
 
-function setMarriage(userId, data) {
-  db.prepare(`
-    INSERT OR REPLACE INTO marriages
-    (userId, partner, since, kids)
-    VALUES (?, ?, ?, ?)
-  `).run(
-    userId,
-    data.partner,
-    data.since,
-    JSON.stringify(data.kids || [])
-  );
+async function setMarriage(userId, data) {
+  await supabase
+    .from("marriages")
+    .upsert({
+      userId,
+      partner: data.partner,
+      since: data.since,
+      kids: data.kids || []
+    });
 }
 
-function deleteMarriage(userId) {
-  db.prepare(
-    "DELETE FROM marriages WHERE userId = ?"
-  ).run(userId);
+async function deleteMarriage(userId) {
+  await supabase
+    .from("marriages")
+    .delete()
+    .eq("userId", userId);
 }
 
 const app = express();
@@ -382,14 +377,14 @@ if (interaction.commandName === "propose") {
     return;
   }
 
-  if (getMarriage(interaction.user.id)) {
+  if (await getMarriage(interaction.user.id)) {
     await interaction.reply(
       "you're already married"
     );
     return;
   }
 
-  if (getMarriage(user.id)) {
+  if (await getMarriage(user.id)) {
     await interaction.reply(
       "they're already married"
     );
@@ -435,13 +430,13 @@ if (
   return;
 }
 
-    setMarriage(interaction.user.id, {
+                await setMarriage(interaction.user.id, {
   partner: user.id,
   since: Date.now(),
   kids: []
 });
 
-setMarriage(user.id, {
+            await setMarriage(user.id, {
   partner: interaction.user.id,
   since: Date.now(),
   kids: []
@@ -461,7 +456,7 @@ setMarriage(user.id, {
 if (interaction.commandName === "relationship") {
 
   const marriage =
-    getMarriage(interaction.user.id);
+                await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -519,7 +514,7 @@ description:
 if (interaction.commandName === "divorce") {
 
   const marriage =
-    getMarriage(interaction.user.id);
+                await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -530,8 +525,8 @@ if (interaction.commandName === "divorce") {
 
   const partnerId = marriage.partner;
 
-  deleteMarriage(interaction.user.id);
-deleteMarriage(partnerId);
+  await deleteMarriage(interaction.user.id);
+await deleteMarriage(partnerId);
 
 
   await interaction.reply(
@@ -544,7 +539,7 @@ if (interaction.commandName === "cheat") {
     interaction.options.getUser("user");
 
   const marriage =
-    getMarriage(interaction.user.id);
+                await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -580,7 +575,7 @@ if (interaction.commandName === "adopt") {
     interaction.options.getUser("user");
 
   const marriage =
-    getMarriage(interaction.user.id);
+                await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -626,14 +621,14 @@ if (marriage.kids.includes(child.id)) {
 }
 marriage.kids.push(child.id);
 
-setMarriage(interaction.user.id, {
+            await setMarriage(interaction.user.id, {
   partner: marriage.partner,
   since: marriage.since,
   kids: marriage.kids
 });
 
 const partnerMarriage =
-  getMarriage(marriage.partner);
+              await getMarriage(marriage.partner);
 
 if (!partnerMarriage) {
   await interaction.reply(
@@ -644,7 +639,7 @@ if (!partnerMarriage) {
 
 partnerMarriage.kids = marriage.kids;
 
-setMarriage(marriage.partner, {
+            await setMarriage(marriage.partner, {
   partner: partnerMarriage.partner,
   since: partnerMarriage.since,
   kids: partnerMarriage.kids
@@ -657,7 +652,7 @@ setMarriage(marriage.partner, {
 if (interaction.commandName === "family") {
 
   const marriage =
-  getMarriage(interaction.user.id);
+              await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(

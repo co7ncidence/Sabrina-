@@ -929,7 +929,6 @@ startTurn(message.channel, game);
   await message.reply("dictionary check failed");
 }
   
-return; 
   
 if (!message.mentions.has(client.user)) return;
 

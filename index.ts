@@ -27,13 +27,17 @@ if (!process.env.OPENROUTER_API_KEY) {
   throw new Error("Missing OPENROUTER_API_KEY");
 }
 async function getMarriage(userId) {
+
   const { data, error } = await supabase
     .from("marriages")
     .select("*")
-    .eq("userId", userId)
+    .eq("userid", userId)
     .single();
 
-  if (error || !data) return null;
+  if (error || !data) {
+    console.error("SUPABASE LOAD ERROR:", error);
+    return null;
+  }
 
   return {
     partner: data.partner,
@@ -45,13 +49,18 @@ async function getMarriage(userId) {
 async function setMarriage(userId, data) {
 
   const { error } = await supabase
-    .from("marriages")
-    .upsert({
-      userId,
+  .from("marriages")
+  .upsert(
+    {
+      userid: userId,
       partner: data.partner,
       since: data.since,
       kids: data.kids || []
-    });
+    },
+    {
+      onConflict: "userid"
+    }
+  );
 
   if (error) {
     console.error("SUPABASE SAVE ERROR:", error);
@@ -62,7 +71,7 @@ async function deleteMarriage(userId) {
   await supabase
     .from("marriages")
     .delete()
-    .eq("userId", userId);
+    .eq("userid", userId);
 }
 
 const app = express();

@@ -31,26 +31,6 @@ async function getMarriage(userId) {
   const { data, error } = await supabase
     .from("marriages")
     .select("*")
-    .eq("userId", userId)
-    .single();
-
-  if (error || !data) {
-    console.error("SUPABASE LOAD ERROR:", error);
-    return null;
-  }
-
-  return {
-    partner: data.partner,
-    since: data.since,
-    kids: data.kids || []
-  };
-}
-
-async function getMarriage(userId) {
-
-  const { data, error } = await supabase
-    .from("marriages")
-    .select("*")
     .eq("userid", userId)
     .single();
 
@@ -83,7 +63,7 @@ async function setMarriage(userId, data) {
     )
     .select();
 
-  console.log(result);
+  console.log("SUPABASE RESULT:", result);
 }
 
 async function deleteMarriage(userId) {

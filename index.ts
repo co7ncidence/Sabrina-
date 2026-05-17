@@ -874,62 +874,69 @@ return;
 
 const game = blackteaGames.get(message.channel.id);
 
-if (!game) return;
+if (game) {
 
-const currentPlayer =
-  game.players[game.turnIndex];
+  const currentPlayer =
+    game.players[game.turnIndex];
 
-if (message.author.id !== currentPlayer.id) {
-  return;
-}
-  const word = lowered;
+  if (message.author.id === currentPlayer.id) {
 
-if (
-  !word.includes(game.combo) ||
-  word.length < game.combo.length + 1
-) {
+    const word = lowered;
 
-  await message.react("❌");
+    if (
+      !word.includes(game.combo) ||
+      word.length < game.combo.length + 1
+    ) {
 
-  return;
-}
-try {
-  const res = await fetch(
-    `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-  );
+      await message.react("❌");
+      return;
+    }
 
-  console.log("status:", res.status);
+    try {
 
-  if (!res.ok) {
-    await message.react("❌");
+      const res = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+      );
+
+      console.log("status:", res.status);
+
+      if (!res.ok) {
+        await message.react("❌");
+        return;
+      }
+
+      await message.react("✅");
+
+      const existingTimer =
+        playerTimers.get(message.channel.id);
+
+      if (existingTimer) {
+        clearInterval(existingTimer);
+        playerTimers.delete(message.channel.id);
+      }
+
+      game.turnIndex =
+        (game.turnIndex + 1) %
+        game.players.length;
+
+      await message.channel.send(
+        `✅ correct`
+      );
+
+      startTurn(message.channel, game);
+
+    } catch (err) {
+
+      console.error(err);
+
+      await message.reply(
+        "dictionary check failed"
+      );
+    }
+
     return;
   }
-
-await message.react("✅");
-
-const existingTimer =
-  playerTimers.get(message.channel.id);
-
-if (existingTimer) {
-  clearInterval(existingTimer);
-  playerTimers.delete(message.channel.id);
-}
-
-game.turnIndex =
-  (game.turnIndex + 1) %
-  game.players.length;
-
-await message.channel.send(
-  `✅ correct`
-);
-
-startTurn(message.channel, game);
-} catch (err) {
-  console.error(err);
-  await message.reply("dictionary check failed");
-}
-  
-  
+} 
 if (!message.mentions.has(client.user)) return;
 
 try {

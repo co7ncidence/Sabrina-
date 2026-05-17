@@ -703,6 +703,18 @@ collector.on("end", async (_, reason) => {
     }).catch(() => null);
   }
 });
+
+} catch (err) {
+
+  console.error(err);
+
+  await interaction.editReply({
+    content: "something broke",
+    components: []
+  }).catch(() => null);
+
+}
+}
 if (interaction.commandName === "adopt") {
 
   const child =

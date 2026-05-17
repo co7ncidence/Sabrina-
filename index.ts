@@ -659,14 +659,24 @@ async function startTurn(channel, game) {
 
   if (game.players.length === 1) {
 
-    await channel.send(
-      `🏆 <@${game.players[0].id}> wins blacktea`
-    );
+  const winner = game.players[0];
 
-    blackteaGames.delete(channel.id);
+  const activeTimer =
+    playerTimers.get(channel.id);
 
-    return;
+  if (activeTimer) {
+    clearInterval(activeTimer);
+    playerTimers.delete(channel.id);
   }
+
+  blackteaGames.delete(channel.id);
+
+  await channel.send(
+    `🏆 <@${winner.id}> wins blacktea`
+  );
+
+  return;
+}
 
   const player =
     game.players[game.turnIndex];
@@ -879,64 +889,64 @@ if (game) {
   const currentPlayer =
     game.players[game.turnIndex];
 
-  if (message.author.id === currentPlayer.id) {
+  // ignore everyone except current player
+  if (message.author.id !== currentPlayer.id) {
+    return;
+  }
 
-    const word = lowered;
+  const word = lowered.replace(/[^a-z]/g, "");
 
-    if (
-      !word.includes(game.combo) ||
-      word.length < game.combo.length + 1
-    ) {
+  if (
+    !word.includes(game.combo) ||
+    word.length < game.combo.length + 1
+  ) {
 
+    await message.react("❌");
+    return;
+  }
+
+  try {
+
+    const res = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+    );
+
+    if (!res.ok) {
       await message.react("❌");
       return;
     }
 
-    try {
+    await message.react("✅");
 
-      const res = await fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-      );
+    const existingTimer =
+      playerTimers.get(message.channel.id);
 
-      console.log("status:", res.status);
-
-      if (!res.ok) {
-        await message.react("❌");
-        return;
-      }
-
-      await message.react("✅");
-
-      const existingTimer =
-        playerTimers.get(message.channel.id);
-
-      if (existingTimer) {
-        clearInterval(existingTimer);
-        playerTimers.delete(message.channel.id);
-      }
-
-      game.turnIndex =
-        (game.turnIndex + 1) %
-        game.players.length;
-
-      await message.channel.send(
-        `✅ correct`
-      );
-
-      startTurn(message.channel, game);
-
-    } catch (err) {
-
-      console.error(err);
-
-      await message.reply(
-        "dictionary check failed"
-      );
+    if (existingTimer) {
+      clearInterval(existingTimer);
+      playerTimers.delete(message.channel.id);
     }
 
-    return;
+    game.turnIndex =
+      (game.turnIndex + 1) %
+      game.players.length;
+
+    await message.channel.send(
+      `✅ correct`
+    );
+
+    startTurn(message.channel, game);
+
+  } catch (err) {
+
+    console.error(err);
+
+    await message.reply(
+      "dictionary check failed"
+    );
   }
-} 
+
+  return;
+}
 if (!message.mentions.has(client.user)) return;
 
 try {

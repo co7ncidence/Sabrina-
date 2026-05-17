@@ -46,36 +46,51 @@ async function getMarriage(userId) {
   };
 }
 
-async function setMarriage(userId, data) {
+async function getMarriage(userId) {
 
-  console.log("TRYING TO SAVE:", {
-    userId,
-    partner: data.partner
-  });
+  const { data, error } = await supabase
+    .from("marriages")
+    .select("*")
+    .eq("userid", userId)
+    .single();
+
+  if (error || !data) {
+    console.error("SUPABASE LOAD ERROR:", error);
+    return null;
+  }
+
+  return {
+    partner: data.partner,
+    since: data.since,
+    kids: data.kids || []
+  };
+}
+
+async function setMarriage(userId, data) {
 
   const result = await supabase
     .from("marriages")
     .upsert(
       {
-        userId: userId,
+        userid: userId,
         partner: data.partner,
         since: data.since,
         kids: data.kids || []
       },
       {
-        onConflict: "userId"
+        onConflict: "userid"
       }
     )
     .select();
 
-  console.log("SUPABASE RESULT:", result);
+  console.log(result);
 }
 
 async function deleteMarriage(userId) {
   await supabase
     .from("marriages")
     .delete()
-    .eq("userId", userId);
+    .eq("userid", userId);
 }
 
 const app = express();

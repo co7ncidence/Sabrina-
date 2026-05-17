@@ -108,13 +108,13 @@ const commands = [
     .setDescription("who sabrina flirts with")
     .setRequired(true)
 ),
- new SlashCommandBuilder()
-  .setName("marry")
-  .setDescription("marry someone")
+new SlashCommandBuilder()
+  .setName("propose")
+  .setDescription("propose to someone")
   .addUserOption(option =>
     option
       .setName("user")
-      .setDescription("who to marry")
+      .setDescription("who to propose to")
       .setRequired(true)
   ),
 
@@ -123,8 +123,8 @@ new SlashCommandBuilder()
   .setDescription("divorce your partner"),
 
 new SlashCommandBuilder()
-  .setName("date")
-  .setDescription("see your relationship"),
+  .setName("relationship")
+  .setDescription("see your relationship status"),
 
 new SlashCommandBuilder()
   .setName("cheat")
@@ -134,7 +134,21 @@ new SlashCommandBuilder()
       .setName("user")
       .setDescription("side piece")
       .setRequired(true)
-  ), 
+  ),
+
+new SlashCommandBuilder()
+  .setName("adopt")
+  .setDescription("adopt a child")
+  .addUserOption(option =>
+    option
+      .setName("user")
+      .setDescription("child to adopt")
+      .setRequired(true)
+  ),
+
+new SlashCommandBuilder()
+  .setName("family")
+  .setDescription("view your family") 
 
 ].map(command => command.toJSON());
   
@@ -311,7 +325,7 @@ if (interaction.commandName === "dirtytalk") {
     ]
   });
 }
-if (interaction.commandName === "marry") {
+if (interaction.commandName === "propose") {
 
   const user =
     interaction.options.getUser("user");
@@ -337,23 +351,66 @@ if (interaction.commandName === "marry") {
     return;
   }
 
-  marriages[interaction.user.id] = {
-    partner: user.id,
-    since: Date.now()
-  };
-
-  marriages[user.id] = {
-    partner: interaction.user.id,
-    since: Date.now()
-  };
-
-  saveMarriages();
-
   await interaction.reply(
-    `💍 ${interaction.user} married ${user}`
+    `${user}, ${interaction.user} proposed to you 💍\nreply with "yes" or "no" within 30 seconds`
   );
+
+  const filter = (m) =>
+    m.author.id === user.id;
+
+  try {
+
+    const collected =
+      await interaction.channel.awaitMessages({
+        filter,
+        max: 1,
+        time: 30000,
+        errors: ["time"]
+      });
+
+    const response =
+  collected.first().content
+    .toLowerCase()
+    .trim();
+
+if (
+  response !== "yes" &&
+  response !== "y"
+) {
+
+  await interaction.channel.send(
+    `💔 ${user} rejected the proposal`
+  );
+
+  return;
 }
-if (interaction.commandName === "date") {
+
+    marriages[interaction.user.id] = {
+      partner: user.id,
+      since: Date.now(),
+      kids: []
+    };
+
+    marriages[user.id] = {
+      partner: interaction.user.id,
+      since: Date.now(),
+      kids: []
+    };
+
+    saveMarriages();
+
+    await interaction.channel.send(
+      `💍 ${interaction.user} and ${user} are now married`
+    );
+
+  } catch {
+
+    await interaction.channel.send(
+      "proposal expired"
+    );
+  }
+}
+if (interaction.commandName === "relationship") {
 
   const marriage =
     marriages[interaction.user.id];
@@ -376,6 +433,18 @@ if (interaction.commandName === "date") {
       (1000 * 60 * 60 * 24)
     );
 
+  let kidsText = "none";
+
+  if (
+    marriage.kids &&
+    marriage.kids.length > 0
+  ) {
+    kidsText =
+      marriage.kids
+        .map(id => `<@${id}>`)
+        .join(", ");
+  }
+
   await interaction.reply({
     embeds: [
       {
@@ -388,11 +457,14 @@ if (interaction.commandName === "date") {
         description:
 `💍 married to ${partner}
 
-♡ together for ${days} day(s)`,
+♡ together for ${days} day(s)
+
+👶 kids: ${kidsText}`,
 
         footer: {
-  text: "true love or stockholm syndrome"
-}
+          text:
+            "true love or stockholm syndrome"
+        }
       }
     ]
   });
@@ -456,6 +528,114 @@ if (interaction.commandName === "cheat") {
     );
   }
 }
+if (interaction.commandName === "adopt") {
+
+  const child =
+    interaction.options.getUser("user");
+
+  const marriage =
+    marriages[interaction.user.id];
+
+  if (!marriage) {
+    await interaction.reply(
+      "you need to be married first"
+    );
+    return;
+  }
+
+  if (child.id === interaction.user.id) {
+    await interaction.reply(
+      "you cannot adopt yourself"
+    );
+    return;
+  }
+
+  const partner =
+    await client.users.fetch(
+      marriage.partner
+    );
+
+  if (!marriage.kids) {
+    marriage.kids = [];
+  }
+if (child.bot) {
+  await interaction.reply(
+    "you cannot adopt a bot"
+  );
+  return;
+}
+
+if (child.id === partner.id) {
+  await interaction.reply(
+    "you cannot adopt your partner 😭"
+  );
+  return;
+}
+
+if (marriage.kids.includes(child.id)) {
+  await interaction.reply(
+    "that child is already adopted"
+  );
+  return;
+}
+  marriage.kids.push(child.id);
+
+  marriages[partner.id].kids =
+    marriage.kids;
+
+  saveMarriages();
+
+  await interaction.reply(
+    `👶 ${interaction.user} and ${partner} adopted ${child}`
+  );
+}  
+if (interaction.commandName === "family") {
+
+  const marriage =
+    marriages[interaction.user.id];
+
+  if (!marriage) {
+    await interaction.reply(
+      "you dont have a family"
+    );
+    return;
+  }
+
+  const partner =
+    await client.users.fetch(
+      marriage.partner
+    );
+
+  let kidsText = "none";
+
+  if (
+    marriage.kids &&
+    marriage.kids.length > 0
+  ) {
+    kidsText =
+      marriage.kids
+        .map(id => `<@${id}>`)
+        .join("\n");
+  }
+
+  await interaction.reply({
+    embeds: [
+      {
+        color: 0xff2d8d,
+
+        author: {
+          name: "♡ family"
+        },
+
+        description:
+`💍 partner: ${partner}
+
+👶 children:
+${kidsText}`
+      }
+    ]
+  });
+}    
 });  
 client.on("messageDelete", async (message) => {
   if (!message.guild) return;
@@ -749,7 +929,7 @@ startTurn(message.channel, game);
   await message.reply("dictionary check failed");
 }
   
-return;
+return; 
   
 if (!message.mentions.has(client.user)) return;
 

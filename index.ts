@@ -31,7 +31,7 @@ async function getMarriage(userId) {
   const { data, error } = await supabase
     .from("marriages")
     .select("*")
-    .eq("userid", userId)
+    .eq("userId", userId)
     .single();
 
   if (error || !data) {
@@ -52,7 +52,7 @@ async function setMarriage(userId, data) {
   .from("marriages")
   .upsert(
     {
-      userid: userId,
+      userId: userId,
       partner: data.partner,
       since: data.since,
       kids: data.kids || []
@@ -71,7 +71,7 @@ async function deleteMarriage(userId) {
   await supabase
     .from("marriages")
     .delete()
-    .eq("userid", userId);
+    .eq("userId", userId);
 }
 
 const app = express();

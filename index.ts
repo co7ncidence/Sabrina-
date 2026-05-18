@@ -717,6 +717,7 @@ collector.on("end", async (_, reason) => {
   }).catch(() => null);
 
 }
+}  
 if (interaction.commandName === "adopt") {
 
   const child =

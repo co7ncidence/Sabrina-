@@ -349,42 +349,43 @@ if (interaction.commandName === "dirtytalk") {
   await interaction.deleteReply();
 
   await interaction.channel.send({
-    embeds: [
-      {
-        color: 0xff2d8d,
+  content: `<@${user.id}>`,
+  embeds: [
+    {
+      color: 0xff2d8d,
 
-        author: {
-          name: "☎ SABRINA HOTLINE"
-        },
+      author: {
+        name: "☎ SABRINA HOTLINE"
+      },
 
-        description:
+      description:
 `## incoming call...
 
 > ${randomLine}
 
 📞 sent to ${user}`,
 
-        fields: [
-          {
-            name: "caller id",
-            value: "unknown",
-            inline: true
-          },
-          {
-            name: "line",
-            value: "private",
-            inline: true
-          }
-        ],
-
-        footer: {
-          text: "call may be monitored"
+      fields: [
+        {
+          name: "caller id",
+          value: "unknown",
+          inline: true
         },
+        {
+          name: "line",
+          value: "private",
+          inline: true
+        }
+      ],
 
-        timestamp: new Date().toISOString()
-      }
-    ]
-  });
+      footer: {
+        text: "call may be monitored"
+      },
+
+      timestamp: new Date().toISOString()
+    }
+  ]
+});
 }
 if (interaction.commandName === "propose") {
 

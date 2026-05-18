@@ -227,7 +227,7 @@ client.once("ready", () => {
   client.user.setPresence({
     activities: [
       {
-        name: "💋",
+        name: "✨",
         type: 3
       }
     ],

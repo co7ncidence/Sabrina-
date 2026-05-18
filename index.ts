@@ -30,6 +30,35 @@ if (!process.env.CLIENT_ID) {
 if (!process.env.OPENROUTER_API_KEY) {
   throw new Error("Missing OPENROUTER_API_KEY");
 }
+async function getAfk(userId) {
+
+  const { data } = await supabase
+    .from("afk")
+    .select("*")
+    .eq("userid", userId)
+    .single();
+
+  return data || null;
+}
+
+async function setAfk(userId, reason) {
+
+  await supabase
+    .from("afk")
+    .upsert({
+      userid: userId,
+      reason,
+      since: Date.now()
+    });
+}
+
+async function removeAfk(userId) {
+
+  await supabase
+    .from("afk")
+    .delete()
+    .eq("userid", userId);
+}
 async function getMarriage(userId) {
 
   const { data, error } = await supabase
@@ -131,6 +160,16 @@ const commands = [
       PermissionFlagsBits.ManageMessages
     ),
 
+new SlashCommandBuilder()
+  .setName("afk")
+  .setDescription("set your afk status")
+  .addStringOption(option =>
+    option
+      .setName("reason")
+      .setDescription("why you're afk")
+      .setRequired(false)
+  ),
+  
   new SlashCommandBuilder()
     .setName("snipe")
     .setDescription("show the last deleted message"),
@@ -240,7 +279,30 @@ client.once("ready", () => {
     !interaction.isChatInputCommand() &&
     !interaction.isButton()
   ) return;
+if (interaction.commandName === "afk") {
 
+  const reason =
+    interaction.options.getString("reason") ||
+    "no reason";
+
+  await setAfk(
+    interaction.user.id,
+    reason
+  );
+
+  await interaction.reply({
+    embeds: [
+      {
+        color: 0xff2d8d,
+
+        description:
+`🌙 ${interaction.user} is now afk
+
+> ${reason}`
+      }
+    ]
+  });
+}
   // whisper
 if (interaction.commandName === "whisper") {
 
@@ -964,10 +1026,52 @@ if (!game.players.length) {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
+
+const afkData =
+  await getAfk(message.author.id);
+
+if (afkData) {
+
+  const minutes =
+    Math.floor(
+      (Date.now() - afkData.since) /
+      60000
+    );
+
+  await removeAfk(message.author.id);
+
+  await message.reply(
+    `welcome back\nyou were afk for ${minutes} minutes`
+  );
+}
   
 const content = message.content;
 const lowered = content.toLowerCase();
 
+for (const [, user] of message.mentions.users) {
+
+  if (user.bot) continue;
+
+  const afk =
+    await getAfk(user.id);
+
+  if (!afk) continue;
+
+  const minutes =
+    Math.floor(
+      (Date.now() - afk.since) /
+      60000
+    );
+
+  await message.reply(
+    `🌙 ${user.username} is afk
+
+> ${afk.reason}
+
+gone for ${minutes} minutes`
+  );
+}
+  
 if (
   lowered.startsWith("!") &&
   lowered !== "!blacktea" &&

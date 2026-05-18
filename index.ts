@@ -677,16 +677,19 @@ collector.on("collect", async (buttonInteraction) => {
       components: []
     });
 
-    const secretMessage =
-      `🤫 nobody found out about you and ${sideUser}`;
+    const cheaterMessage =
+  `🤫 nobody found out about you and ${sideUser}`;
 
-    await interaction.user.send(
-      secretMessage
-    ).catch(() => null);
+const sidePieceMessage =
+  `🤫 ${interaction.user} had an affair with you and nobody found out`;
 
-    await sideUser.send(
-      secretMessage
-    ).catch(() => null);
+await interaction.user.send(
+  cheaterMessage
+).catch(() => null);
+
+await sideUser.send(
+  sidePieceMessage
+).catch(() => null);
   }
 
   collector.stop();
@@ -713,7 +716,6 @@ collector.on("end", async (_, reason) => {
     components: []
   }).catch(() => null);
 
-}
 }
 if (interaction.commandName === "adopt") {
 

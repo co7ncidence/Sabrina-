@@ -1027,22 +1027,57 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
 
-const afkData =
-  await getAfk(message.author.id);
+const diff =
+  Date.now() - afkData.since;
 
-if (afkData) {
+const minutes =
+  Math.floor(diff / 60000);
 
-  const minutes =
-    Math.floor(
-      (Date.now() - afkData.since) /
-      60000
-    );
+const hours =
+  Math.floor(diff / 3600000);
 
-  await removeAfk(message.author.id);
+const days =
+  Math.floor(diff / 86400000);
 
-  await message.reply(
-    `welcome back\nyou were afk for ${minutes} minutes`
-  );
+let timeText = "";
+
+if (days >= 1) {
+
+  const remainingHours =
+    hours % 24;
+
+  timeText =
+    `${days} day${days !== 1 ? "s" : ""}`;
+
+  if (remainingHours > 0) {
+    timeText +=
+      `, ${remainingHours} hour${remainingHours !== 1 ? "s" : ""}`;
+  }
+
+} else if (hours >= 1) {
+
+  const remainingMinutes =
+    minutes % 60;
+
+  timeText =
+    `${hours} hour${hours !== 1 ? "s" : ""}`;
+
+  if (remainingMinutes > 0) {
+    timeText +=
+      `, ${remainingMinutes} minute${remainingMinutes !== 1 ? "s" : ""}`;
+  }
+
+} else {
+
+  timeText =
+    `${minutes} minute${minutes !== 1 ? "s" : ""}`;
+}
+
+await removeAfk(message.author.id);
+
+await message.reply(
+  `welcome back\nyou were afk for ${timeText}`
+);
 }
   
 const content = message.content;

@@ -899,7 +899,7 @@ if (interaction.commandName === "adopt") {
       return;
     }
 
-    partnerMarriage.kids =
+       partnerMarriage.kids =
       marriage.kids;
 
     await setMarriage(marriage.partner, {
@@ -919,20 +919,11 @@ if (interaction.commandName === "adopt") {
     );
   }
 }
-      return;
-    }
 
-    partnerMarriage.kids =
-      marriage.kids;
-
-    await setMarriage(marriage.partner, {
-      partner: partnerMarriage.partner,
-      since: partnerMarriage.since,
-      kids: partner  
 if (interaction.commandName === "family") {
 
   const marriage =
-              await getMarriage(interaction.user.id);
+    await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -942,9 +933,10 @@ if (interaction.commandName === "family") {
   }
 
   const partner =
-  await client.users.fetch(
-    marriage.partner
-  ).catch(() => null);
+    await client.users.fetch(
+      marriage.partner
+    ).catch(() => null);
+
   let kidsText = "none";
 
   if (
@@ -966,7 +958,7 @@ if (interaction.commandName === "family") {
           name: "♡ family"
         },
 
-description:
+        description:
 `💍 partner: ${partner ? `<@${partner.id}>` : "unknown user"}
 
 👶 children:

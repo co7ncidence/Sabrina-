@@ -239,8 +239,11 @@ new SlashCommandBuilder()
 
 new SlashCommandBuilder()
   .setName("family")
-  .setDescription("view your family") 
+  .setDescription("view your family"),
 
+ new SlashCommandBuilder()
+  .setName("runaway")
+  .setDescription("run away from your family"), 
 ].map(command => command.toJSON());
   
 
@@ -920,6 +923,54 @@ if (interaction.commandName === "adopt") {
   }
 }
 
+if (interaction.commandName === "runaway") {
+
+  const userId = interaction.user.id;
+
+  const { data: parentRows } =
+    await supabase
+      .from("marriages")
+      .select("*");
+
+  if (!parentRows) {
+    await interaction.reply(
+      "something broke"
+    );
+    return;
+  }
+
+  const parents =
+    parentRows.filter(row =>
+      row.kids &&
+      row.kids.includes(userId)
+    );
+
+  if (parents.length === 0) {
+    await interaction.reply(
+      "you are not adopted"
+    );
+    return;
+  }
+
+  for (const parent of parents) {
+
+    const updatedKids =
+      parent.kids.filter(
+        id => id !== userId
+      );
+
+    await setMarriage(parent.userid, {
+      partner: parent.partner,
+      since: parent.since,
+      kids: updatedKids
+    });
+  }
+
+  await interaction.reply(
+    `🏃 ${interaction.user} ran away from home`
+  );
+}
+    
 if (interaction.commandName === "family") {
 
   const marriage =

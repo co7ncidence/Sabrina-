@@ -649,7 +649,7 @@ if (!marriage) {
 if (sideUser.id === marriage.partner) {
   await interaction.reply({
     content:
-      "cheating on your partner with your partner is insane",
+      "you cannot cheat on your partner with your partner 💀",
     ephemeral: true
   });
   return;

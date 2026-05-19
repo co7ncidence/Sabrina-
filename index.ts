@@ -891,9 +891,34 @@ if (interaction.commandName === "adopt") {
       await getMarriage(marriage.partner);
 
     if (!partnerMarriage) {
+
       await interaction.channel.send(
         "partner data missing"
       );
+
+      return;
+    }
+
+    partnerMarriage.kids =
+      marriage.kids;
+
+    await setMarriage(marriage.partner, {
+      partner: partnerMarriage.partner,
+      since: partnerMarriage.since,
+      kids: partnerMarriage.kids
+    });
+
+    await interaction.channel.send(
+      `👶 ${child} was adopted by ${interaction.user} and ${partner}`
+    );
+
+  } catch {
+
+    await interaction.channel.send(
+      "adoption request expired"
+    );
+  }
+}
       return;
     }
 

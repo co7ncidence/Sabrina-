@@ -703,8 +703,6 @@ const collector =
 
 collector.on("collect", async (buttonInteraction) => {
 
-  collector.stop();
-
   if (
     buttonInteraction.user.id !== interaction.user.id
   ) {

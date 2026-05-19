@@ -623,19 +623,37 @@ await deleteMarriage(partnerId);
 if (interaction.commandName === "cheat") {
 
   const sideUser =
-    interaction.options.getUser("user");
+  interaction.options.getUser("user");
 
-  const marriage =
-    await getMarriage(interaction.user.id);
+if (sideUser.id === interaction.user.id) {
+  await interaction.reply({
+    content:
+      "you cannot cheat on your partner with yourself 😭",
+    ephemeral: true
+  });
+  return;
+}
 
-  if (!marriage) {
-    await interaction.reply({
-      content:
-        "you need a relationship to ruin first",
-      ephemeral: true
-    });
-    return;
-  }
+const marriage =
+  await getMarriage(interaction.user.id);
+
+if (!marriage) {
+  await interaction.reply({
+    content:
+      "you need a relationship to ruin first",
+    ephemeral: true
+  });
+  return;
+}
+
+if (sideUser.id === marriage.partner) {
+  await interaction.reply({
+    content:
+      "cheating on your partner with your partner is insane",
+    ephemeral: true
+  });
+  return;
+}
 
   const partner =
     await client.users.fetch(

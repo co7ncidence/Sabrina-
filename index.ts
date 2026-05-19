@@ -145,6 +145,20 @@ const combos = [
 "zle", "mph", "ttl", "rlds", "zzl"  
 ];
 
+const custodyReasons = [
+  "your cooking is fucking atrocious and your child deserves better.",
+  "you’re a big back who eats all the food",
+  "you smell like shit",
+  "the child deserves better than your personality",
+  "you’re just ugly lmao 🤣 ",
+  "you broke bitch, you won’t be able to support any child 😭",
+  "get a job.",
+  "the child cried after hearing you speak",
+  "your side of the family is suspicious",
+  "you are genuinely irritating to be around",
+  "youre not beating the deadbeat allegations",
+];
+
 let maxLives = 3;
 const commands = [
   new SlashCommandBuilder()
@@ -601,7 +615,7 @@ description:
 if (interaction.commandName === "divorce") {
 
   const marriage =
-                await getMarriage(interaction.user.id);
+    await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -612,14 +626,83 @@ if (interaction.commandName === "divorce") {
 
   const partnerId = marriage.partner;
 
-  await deleteMarriage(interaction.user.id);
-await deleteMarriage(partnerId);
+  const partnerMarriage =
+    await getMarriage(partnerId);
 
+  const allKids =
+    marriage.kids || [];
 
-  await interaction.reply(
-    "💔 divorce finalized"
-  );
-}  
+  let custodyWinner = null;
+  let custodyLoser = null;
+
+  if (allKids.length > 0) {
+
+    const randomWinner =
+      Math.random() < 0.5
+        ? interaction.user.id
+        : partnerId;
+
+    custodyWinner = randomWinner;
+
+    custodyLoser =
+      randomWinner === interaction.user.id
+        ? partnerId
+        : interaction.user.id;
+
+    const loserKids = [];
+
+    await setMarriage(custodyWinner, {
+      partner: null,
+      since: null,
+      kids: allKids
+    });
+
+    await setMarriage(custodyLoser, {
+      partner: null,
+      since: null,
+      kids: loserKids
+    });
+
+  } else {
+
+    await deleteMarriage(interaction.user.id);
+    await deleteMarriage(partnerId);
+  }
+
+  const winnerUser =
+    await client.users.fetch(custodyWinner)
+      .catch(() => null);
+
+  const loserUser =
+    await client.users.fetch(custodyLoser)
+      .catch(() => null);
+
+  const randomReason =
+    custodyReasons[
+      Math.floor(
+        Math.random() * custodyReasons.length
+      )
+    ];
+
+  if (allKids.length > 0) {
+
+    await interaction.reply(
+`💔 divorce finalized
+
+⚖ judge sabrina has reviewed the divorce
+
+👶 custody of ${allKids.map(id => `<@${id}>`).join(", ")} goes to ${winnerUser}
+
+${loserUser} ${randomReason}`
+    );
+
+  } else {
+
+    await interaction.reply(
+      "💔 divorce finalized"
+    );
+  }
+}
 if (interaction.commandName === "cheat") {
 
   const sideUser =

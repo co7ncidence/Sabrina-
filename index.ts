@@ -744,10 +744,18 @@ collector.on("collect", async (buttonInteraction) => {
     });
 
     const cheaterMessage =
-  `🤫 nobody found out about you and ${sideUser}`;
+  `🤫 nobody found out about your secret affair with ${sideUser}`;
 
 const sidePieceMessage =
-  `🤫 ${interaction.user} had an affair with you and nobody found out`;
+  `🤫 nobody found out about your secret affair with ${interaction.user}`;
+
+await interaction.user.send(
+  cheaterMessage
+).catch(() => null);
+
+await sideUser.send(
+  sidePieceMessage
+).catch(() => null);
 
 await interaction.user.send(
   cheaterMessage

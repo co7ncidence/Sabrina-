@@ -626,11 +626,22 @@ if (interaction.commandName === "cheat") {
   interaction.options.getUser("user");
 
 if (sideUser.id === interaction.user.id) {
+
+  const responses = [
+    "your side piece cannot literally be yourself dumbass",
+    "you became your own sneaky link",
+    "how the fuck are you cheating with yourself",
+    "thats just masturbation dumbass"
+  ];
+
+  const randomResponse =
+    responses[Math.floor(Math.random() * responses.length)];
+
   await interaction.reply({
-    content:
-      "you cannot cheat on your partner with yourself 😭",
+    content: randomResponse,
     ephemeral: true
   });
+
   return;
 }
 
@@ -652,7 +663,7 @@ if (sideUser.id === marriage.partner) {
     "cheating on your partner with your partner is insane",
     "your side piece cannot be the main piece dumbass",
     "even sabrina is confused by this one",
-    "bro thats literally your wife"
+    "bro thats literally your partner"
   ];
 
   const randomResponse =

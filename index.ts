@@ -787,7 +787,7 @@ if (interaction.commandName === "adopt") {
     interaction.options.getUser("user");
 
   const marriage =
-                await getMarriage(interaction.user.id);
+    await getMarriage(interaction.user.id);
 
   if (!marriage) {
     await interaction.reply(
@@ -811,56 +811,99 @@ if (interaction.commandName === "adopt") {
   if (!marriage.kids) {
     marriage.kids = [];
   }
-if (child.bot) {
-  await interaction.reply(
-    "you cannot adopt a bot"
-  );
-  return;
-}
 
-if (child.id === partner.id){
-  await interaction.reply(
-    "you cannot adopt your partner 😭"
-  );
-  return;
-}
+  if (child.bot) {
+    await interaction.reply(
+      "you cannot adopt a bot"
+    );
+    return;
+  }
 
-if (marriage.kids.includes(child.id)) {
-  await interaction.reply(
-    "that child is already adopted"
-  );
-  return;
-}
-marriage.kids.push(child.id);
+  if (child.id === partner.id) {
+    await interaction.reply(
+      "you cannot adopt your partner 😭"
+    );
+    return;
+  }
 
-            await setMarriage(interaction.user.id, {
-  partner: marriage.partner,
-  since: marriage.since,
-  kids: marriage.kids
-});
-
-const partnerMarriage =
-              await getMarriage(marriage.partner);
-
-if (!partnerMarriage) {
-  await interaction.reply(
-    "partner data missing"
-  );
-  return;
-}
-
-partnerMarriage.kids = marriage.kids;
-
-            await setMarriage(marriage.partner, {
-  partner: partnerMarriage.partner,
-  since: partnerMarriage.since,
-  kids: partnerMarriage.kids
-});
+  if (marriage.kids.includes(child.id)) {
+    await interaction.reply(
+      "that child is already adopted"
+    );
+    return;
+  }
 
   await interaction.reply(
-    `👶 ${interaction.user} and ${partner} adopted ${child}`
+    `${child}, ${interaction.user} and ${partner} want to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
   );
-}  
+
+  const filter = (m) =>
+    m.author.id === child.id;
+
+  try {
+
+    const collected =
+      await interaction.channel.awaitMessages({
+        filter,
+        max: 1,
+        time: 30000,
+        errors: ["time"]
+      });
+
+    const response =
+      collected.first().content
+        .toLowerCase()
+        .trim();
+
+    if (
+      response === "no" ||
+      response === "n"
+    ) {
+
+      await interaction.channel.send(
+        `💔 ${child} refused to be adopted`
+      );
+
+      return;
+    }
+
+    if (
+      response !== "yes" &&
+      response !== "y"
+    ) {
+
+      await interaction.channel.send(
+        "reply with yes or no"
+      );
+
+      return;
+    }
+
+    marriage.kids.push(child.id);
+
+    await setMarriage(interaction.user.id, {
+      partner: marriage.partner,
+      since: marriage.since,
+      kids: marriage.kids
+    });
+
+    const partnerMarriage =
+      await getMarriage(marriage.partner);
+
+    if (!partnerMarriage) {
+      await interaction.channel.send(
+        "partner data missing"
+      );
+      return;
+    }
+
+    partnerMarriage.kids =
+      marriage.kids;
+
+    await setMarriage(marriage.partner, {
+      partner: partnerMarriage.partner,
+      since: partnerMarriage.since,
+      kids: partner  
 if (interaction.commandName === "family") {
 
   const marriage =

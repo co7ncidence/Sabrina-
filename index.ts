@@ -647,11 +647,22 @@ if (!marriage) {
 }
 
 if (sideUser.id === marriage.partner) {
+
+  const responses = [
+    "cheating on your partner with your partner is insane",
+    "your side piece cannot be the main piece dumbass",
+    "even sabrina is confused by this one",
+    "bro thats literally your wife"
+  ];
+
+  const randomResponse =
+    responses[Math.floor(Math.random() * responses.length)];
+
   await interaction.reply({
-    content:
-      "you cannot cheat on your partner with your partner 💀",
+    content: randomResponse,
     ephemeral: true
   });
+
   return;
 }
 

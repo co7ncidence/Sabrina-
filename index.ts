@@ -759,13 +759,6 @@ await sideUser.send(
   sidePieceMessage
 ).catch(() => null);
 
-await interaction.user.send(
-  cheaterMessage
-).catch(() => null);
-
-await sideUser.send(
-  sidePieceMessage
-).catch(() => null);
   }
 
   collector.stop();

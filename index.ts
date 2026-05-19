@@ -1027,8 +1027,78 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user?.id) return;
 
-const diff =
-  Date.now() - afkData.since;
+  const afkData =
+    await getAfk(message.author.id);
+
+  if (afkData) {
+
+    const diff =
+      Date.now() - afkData.since;
+
+    const minutes =
+      Math.floor(diff / 60000);
+
+    const hours =
+      Math.floor(diff / 3600000);
+
+    const days =
+      Math.floor(diff / 86400000);
+
+    let timeText = "";
+
+    if (days >= 1) {
+
+      const remainingHours =
+        hours % 24;
+
+      timeText =
+        `${days} day${days !== 1 ? "s" : ""}`;
+
+      if (remainingHours > 0) {
+        timeText +=
+          `, ${remainingHours} hour${remainingHours !== 1 ? "s" : ""}`;
+      }
+
+    } else if (hours >= 1) {
+
+      const remainingMinutes =
+        minutes % 60;
+
+      timeText =
+        `${hours} hour${hours !== 1 ? "s" : ""}`;
+
+      if (remainingMinutes > 0) {
+        timeText +=
+          `, ${remainingMinutes} minute${remainingMinutes !== 1 ? "s" : ""}`;
+      }
+
+    } else {
+
+      timeText =
+        `${minutes} minute${minutes !== 1 ? "s" : ""}`;
+    }
+
+    await removeAfk(message.author.id);
+
+    await message.reply(
+      `welcome back\nyou were afk for ${timeText}`
+    );
+  }
+
+  const content = message.content;
+  const lowered = content.toLowerCase();
+
+for (const [, user] of message.mentions.users) {
+
+  if (user.bot) continue;
+
+  const afk =
+    await getAfk(user.id);
+
+  if (!afk) continue;
+
+  const diff =
+  Date.now() - afk.since;
 
 const minutes =
   Math.floor(diff / 60000);
@@ -1073,38 +1143,13 @@ if (days >= 1) {
     `${minutes} minute${minutes !== 1 ? "s" : ""}`;
 }
 
-await removeAfk(message.author.id);
-
 await message.reply(
-  `welcome back\nyou were afk for ${timeText}`
-);
-}
-  
-const content = message.content;
-const lowered = content.toLowerCase();
-
-for (const [, user] of message.mentions.users) {
-
-  if (user.bot) continue;
-
-  const afk =
-    await getAfk(user.id);
-
-  if (!afk) continue;
-
-  const minutes =
-    Math.floor(
-      (Date.now() - afk.since) /
-      60000
-    );
-
-  await message.reply(
-    `🌙 ${user.username} is afk
+  `🌙 ${user.username} is afk
 
 > ${afk.reason}
 
-gone for ${minutes} minutes`
-  );
+gone for ${timeText}`
+);
 }
   
 if (

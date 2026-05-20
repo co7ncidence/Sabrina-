@@ -1105,7 +1105,16 @@ if (interaction.commandName === "family") {
   const marriage =
     await getMarriage(interaction.user.id);
 
-  if (!marriage) {
+  if (
+  !marriage ||
+  (
+    !marriage.partner &&
+    (
+      !marriage.kids ||
+      marriage.kids.length === 0
+    )
+  )
+) {
   await interaction.reply(
     "you dont have a family"
   );

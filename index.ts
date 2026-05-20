@@ -908,14 +908,19 @@ if (interaction.commandName === "adopt") {
   const child =
     interaction.options.getUser("user");
 
-  const marriage =
+    let marriage =
     await getMarriage(interaction.user.id);
 
+  // allow single parents
   if (!marriage) {
-    await interaction.reply(
-      "you need to be married first"
-    );
-    return;
+
+    marriage = {
+      partner: null,
+      since: null,
+      kids: []
+    };
+
+    await setMarriage(interaction.user.id, marriage);
   }
 
   if (child.id === interaction.user.id) {
@@ -925,10 +930,14 @@ if (interaction.commandName === "adopt") {
     return;
   }
 
-  const partner =
-    await client.users.fetch(
-      marriage.partner
-    );
+    let partner = null;
+
+  if (marriage.partner) {
+    partner =
+      await client.users.fetch(
+        marriage.partner
+      ).catch(() => null);
+  }
 
   if (!marriage.kids) {
     marriage.kids = [];
@@ -1009,26 +1018,24 @@ if (interaction.commandName === "adopt") {
       kids: marriage.kids
     });
 
-    const partnerMarriage =
-      await getMarriage(marriage.partner);
+        // update partner kids too if married
+    if (marriage.partner) {
 
-    if (!partnerMarriage) {
+      const partnerMarriage =
+        await getMarriage(marriage.partner);
 
-      await interaction.channel.send(
-        "partner data missing"
-      );
+      if (partnerMarriage) {
 
-      return;
+        partnerMarriage.kids =
+          marriage.kids;
+
+        await setMarriage(marriage.partner, {
+          partner: partnerMarriage.partner,
+          since: partnerMarriage.since,
+          kids: partnerMarriage.kids
+        });
+      }
     }
-
-       partnerMarriage.kids =
-      marriage.kids;
-
-    await setMarriage(marriage.partner, {
-      partner: partnerMarriage.partner,
-      since: partnerMarriage.since,
-      kids: partnerMarriage.kids
-    });
 
     await interaction.channel.send(
       `👶 ${child} was adopted by ${interaction.user} and ${partner}`
@@ -1036,8 +1043,10 @@ if (interaction.commandName === "adopt") {
 
   } catch {
 
-    await interaction.channel.send(
-      "adoption request expired"
+        await interaction.channel.send(
+      partner
+        ? `👶 ${child} was adopted by ${interaction.user} and ${partner}`
+        : `👶 ${child} was adopted by ${interaction.user}`
     );
   }
 }

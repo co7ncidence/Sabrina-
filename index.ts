@@ -559,12 +559,18 @@ if (interaction.commandName === "relationship") {
   const marriage =
                 await getMarriage(interaction.user.id);
 
-  if (!marriage) {
-    await interaction.reply(
-      "you're single"
-    );
-    return;
-  }
+  if (
+  !marriage ||
+  (
+    !marriage.partner &&
+    (!marriage.kids || marriage.kids.length === 0)
+  )
+) {
+  await interaction.reply(
+    "you're single"
+  );
+  return;
+}
 
   const partner =
   await client.users.fetch(
@@ -600,7 +606,7 @@ if (interaction.commandName === "relationship") {
 description:
 `💍 married to ${partner ? `<@${partner.id}>` : "unknown user"}
 
-♡ together for ${days} day(s)
+♡ together for ${marriage.since ? `${days} day(s)` : "divorced"}
 
 👶 kids: ${kidsText}`,
 
@@ -703,7 +709,7 @@ if (sideUser.id === interaction.user.id) {
     "your side piece cannot literally be yourself dumbass",
     "you became your own sneaky link",
     "how the fuck are you cheating with yourself",
-    "thats just masturbation dumbass"
+    "thats just masturbation dipshit"
   ];
 
   const randomResponse =
@@ -1089,12 +1095,18 @@ if (interaction.commandName === "family") {
   const marriage =
     await getMarriage(interaction.user.id);
 
-  if (!marriage) {
-    await interaction.reply(
-      "you dont have a family"
-    );
-    return;
-  }
+  if (
+  !marriage ||
+  (
+    !marriage.partner &&
+    (!marriage.kids || marriage.kids.length === 0)
+  )
+) {
+  await interaction.reply(
+    "you dont have a family"
+  );
+  return;
+}
 
   const partner =
     await client.users.fetch(

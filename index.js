@@ -309,7 +309,6 @@ if (interaction.commandName === "afk") {
     embeds: [
       {
         color: 0xff2d8d,
-
         description:
 `🌙 ${interaction.user} is now afk
 
@@ -317,6 +316,7 @@ if (interaction.commandName === "afk") {
       }
     ]
   });
+
 }
   // whisper
 if (interaction.commandName === "whisper") {

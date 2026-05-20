@@ -908,7 +908,7 @@ if (interaction.commandName === "adopt") {
   const child =
     interaction.options.getUser("user");
 
-    let marriage =
+  let marriage =
     await getMarriage(interaction.user.id);
 
   // allow single parents
@@ -930,7 +930,7 @@ if (interaction.commandName === "adopt") {
     return;
   }
 
-    let partner = null;
+  let partner = null;
 
   if (marriage.partner) {
     partner =
@@ -951,11 +951,11 @@ if (interaction.commandName === "adopt") {
   }
 
   if (partner && child.id === partner.id) {
-  await interaction.reply(
-    "you cannot adopt your partner 😭"
-  );
-  return;
-}
+    await interaction.reply(
+      "you cannot adopt your partner 😭"
+    );
+    return;
+  }
 
   if (marriage.kids.includes(child.id)) {
     await interaction.reply(
@@ -965,10 +965,10 @@ if (interaction.commandName === "adopt") {
   }
 
   await interaction.reply(
-  partner
-    ? `${child}, ${interaction.user} and ${partner} want to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
-    : `${child}, ${interaction.user} wants to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
-);
+    partner
+      ? `${child}, ${interaction.user} and ${partner} want to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
+      : `${child}, ${interaction.user} wants to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
+  );
 
   const filter = (m) =>
     m.author.id === child.id;
@@ -1020,7 +1020,7 @@ if (interaction.commandName === "adopt") {
       kids: marriage.kids
     });
 
-        // update partner kids too if married
+    // update partner kids too if married
     if (marriage.partner) {
 
       const partnerMarriage =
@@ -1038,15 +1038,17 @@ if (interaction.commandName === "adopt") {
         });
       }
     }
-catch {
-  await interaction.channel.send(
-    "adoption request expired"
-  );
-}
-         await interaction.channel.send(
+
+    await interaction.channel.send(
       partner
         ? `👶 ${child} was adopted by ${interaction.user} and ${partner}`
         : `👶 ${child} was adopted by ${interaction.user}`
+    );
+
+  } catch {
+
+    await interaction.channel.send(
+      "adoption request expired"
     );
   }
 }

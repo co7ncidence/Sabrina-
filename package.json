@@ -6,7 +6,7 @@
     "node": "20.x"
   },
   "scripts": {
-    "start": "tsx index.ts"
+    "start": "node index.js"
   },
   "dependencies": {
     "openai": "^4.0.0",

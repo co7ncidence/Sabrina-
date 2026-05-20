@@ -59,13 +59,6 @@ async function removeAfk(userId) {
     .delete()
     .eq("userid", userId);
 }
-async function getMarriage(userId) {
-
-  const { data, error } = await supabase
-    .from("marriages")
-    .select("*")
-    .eq("userid", userId)
-    .single();
 
   async function getMarriage(userId) {
 

@@ -601,28 +601,30 @@ if (interaction.commandName === "relationship") {
   }
 
   await interaction.reply({
-    embeds: [
-      {
-        color: 0xff2d8d,
+  embeds: [
+    {
+      color: 0xff2d8d,
 
-        author: {
-          name: "♡ relationship status"
-        },
+      author: {
+        name: "♡ relationship status"
+      },
 
-description:
-`💍 married to ${partner ? `<@${partner.id}>` : "unknown user"}
+      description: `💍 married to ${
+        partner ? `<@${partner.id}>` : "unknown user"
+      }
 
-♡ together for ${marriage.since ? `${days} day(s)` : "divorced"}
+♡ together for ${
+        marriage.since ? `${days} day(s)` : "divorced"
+      }
 
 👶 kids: ${kidsText}`,
 
-        footer: {
-          text:
-            "true love or stockholm syndrome"
-        }
+      footer: {
+        text: "true love or stockholm syndrome"
       }
-    ]
-  });
+    }
+  ]
+});
 }   
 if (interaction.commandName === "divorce") {
 

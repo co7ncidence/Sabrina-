@@ -626,65 +626,54 @@ if (interaction.commandName === "divorce") {
 
   const partnerId = marriage.partner;
 
-  const partnerMarriage =
-    await getMarriage(partnerId);
-
   const allKids =
     marriage.kids || [];
 
-  let custodyWinner = null;
-  let custodyLoser = null;
+  // delete both marriages first
+  await deleteMarriage(interaction.user.id);
+  await deleteMarriage(partnerId);
 
+  // if there are kids, randomly assign custody
   if (allKids.length > 0) {
 
-    const randomWinner =
+    const custodyWinner =
       Math.random() < 0.5
         ? interaction.user.id
         : partnerId;
 
-    custodyWinner = randomWinner;
-
-    custodyLoser =
-      randomWinner === interaction.user.id
+    const custodyLoser =
+      custodyWinner === interaction.user.id
         ? partnerId
         : interaction.user.id;
 
-    const loserKids = [];
-
+    // recreate winner marriage data with kids
     await setMarriage(custodyWinner, {
       partner: null,
       since: null,
       kids: allKids
     });
 
+    // recreate loser marriage data without kids
     await setMarriage(custodyLoser, {
       partner: null,
       since: null,
-      kids: loserKids
+      kids: []
     });
 
-  } else {
+    const winnerUser =
+      await client.users.fetch(custodyWinner)
+        .catch(() => null);
 
-    await deleteMarriage(interaction.user.id);
-    await deleteMarriage(partnerId);
-  }
+    const loserUser =
+      await client.users.fetch(custodyLoser)
+        .catch(() => null);
 
-  const winnerUser =
-    await client.users.fetch(custodyWinner)
-      .catch(() => null);
-
-  const loserUser =
-    await client.users.fetch(custodyLoser)
-      .catch(() => null);
-
-  const randomReason =
-    custodyReasons[
-      Math.floor(
-        Math.random() * custodyReasons.length
-      )
-    ];
-
-  if (allKids.length > 0) {
+    const randomReason =
+      custodyReasons[
+        Math.floor(
+          Math.random() * custodyReasons.length
+        )
+      ];
 
     await interaction.reply(
 `💔 divorce finalized

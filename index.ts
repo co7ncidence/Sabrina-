@@ -81,7 +81,7 @@ async function removeAfk(userId) {
 
 async function setMarriage(userId, data) {
 
-  const result = await supabase
+  await supabase
     .from("marriages")
     .upsert(
       {
@@ -93,10 +93,7 @@ async function setMarriage(userId, data) {
       {
         onConflict: "userid"
       }
-    )
-    .select();
-
-  console.log("SUPABASE RESULT:", result);
+    );
 }
 
 async function deleteMarriage(userId) {
@@ -1108,13 +1105,7 @@ if (interaction.commandName === "family") {
   const marriage =
     await getMarriage(interaction.user.id);
 
-  if (
-  !marriage ||
-  (
-    !marriage.partner &&
-    (!marriage.kids || marriage.kids.length === 0)
-  )
-) {
+  if (!marriage) {
   await interaction.reply(
     "you dont have a family"
   );

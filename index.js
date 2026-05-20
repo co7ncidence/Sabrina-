@@ -494,8 +494,15 @@ if (interaction.commandName === "propose") {
     `${user}, ${interaction.user} proposed to you 💍\nreply with "yes" or "no" within 30 seconds`
   );
 
-  const filter = (m) =>
-    m.author.id === user.id;
+  const filter = (m) => {
+  const response =
+    m.content.toLowerCase().trim();
+
+  return (
+    m.author.id === user.id &&
+    ["yes", "y", "no", "n"].includes(response)
+  );
+};
 
   try {
 
@@ -504,7 +511,8 @@ if (interaction.commandName === "propose") {
         filter,
         max: 1,
         time: 30000,
-        errors: ["time"]
+        errors: ["time"],
+        dispose: true
       });
 
     const response =
@@ -969,8 +977,15 @@ if (interaction.commandName === "adopt") {
       : `${child}, ${interaction.user} wants to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
   );
 
-  const filter = (m) =>
-    m.author.id === child.id;
+  const filter = (m) => {
+  const response =
+    m.content.toLowerCase().trim();
+
+  return (
+    m.author.id === child.id &&
+    ["yes", "y", "no", "n"].includes(response)
+  );
+};
 
   try {
 
@@ -979,7 +994,8 @@ if (interaction.commandName === "adopt") {
         filter,
         max: 1,
         time: 30000,
-        errors: ["time"]
+        errors: ["time"],
+        dispose: true
       });
 
     const response =

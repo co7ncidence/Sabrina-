@@ -67,8 +67,15 @@ async function getMarriage(userId) {
     .eq("userid", userId)
     .single();
 
-  if (error || !data) {
-    console.error("SUPABASE LOAD ERROR:", error);
+  async function getMarriage(userId) {
+
+  const { data } = await supabase
+    .from("marriages")
+    .select("*")
+    .eq("userid", userId)
+    .maybeSingle();
+
+  if (!data) {
     return null;
   }
 
@@ -100,6 +107,7 @@ async function setMarriage(userId, data) {
 }
 
 async function deleteMarriage(userId) {
+
   await supabase
     .from("marriages")
     .delete()
@@ -905,6 +913,7 @@ collector.on("end", async (_, reason) => {
 }  
 if (interaction.commandName === "adopt") {
 
+  
   const child =
     interaction.options.getUser("user");
 

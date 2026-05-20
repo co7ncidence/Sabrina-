@@ -950,12 +950,12 @@ if (interaction.commandName === "adopt") {
     return;
   }
 
-  if (child.id === partner.id) {
-    await interaction.reply(
-      "you cannot adopt your partner 😭"
-    );
-    return;
-  }
+  if (partner && child.id === partner.id) {
+  await interaction.reply(
+    "you cannot adopt your partner 😭"
+  );
+  return;
+}
 
   if (marriage.kids.includes(child.id)) {
     await interaction.reply(
@@ -965,8 +965,10 @@ if (interaction.commandName === "adopt") {
   }
 
   await interaction.reply(
-    `${child}, ${interaction.user} and ${partner} want to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
-  );
+  partner
+    ? `${child}, ${interaction.user} and ${partner} want to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
+    : `${child}, ${interaction.user} wants to adopt you 👶\nreply with "yes" or "no" within 30 seconds`
+);
 
   const filter = (m) =>
     m.author.id === child.id;
@@ -1036,14 +1038,12 @@ if (interaction.commandName === "adopt") {
         });
       }
     }
-
-    await interaction.channel.send(
-      `👶 ${child} was adopted by ${interaction.user} and ${partner}`
-    );
-
-  } catch {
-
-        await interaction.channel.send(
+catch {
+  await interaction.channel.send(
+    "adoption request expired"
+  );
+}
+         await interaction.channel.send(
       partner
         ? `👶 ${child} was adopted by ${interaction.user} and ${partner}`
         : `👶 ${child} was adopted by ${interaction.user}`
@@ -1117,10 +1117,13 @@ if (interaction.commandName === "family") {
   return;
 }
 
-  const partner =
-    await client.users.fetch(
-      marriage.partner
-    ).catch(() => null);
+  let partner = null;
+
+if (marriage.partner) {
+  partner = await client.users
+    .fetch(marriage.partner)
+    .catch(() => null);
+}
 
   let kidsText = "none";
 
@@ -1666,7 +1669,7 @@ Examples of tone:
 "girl shut the fuck up"
 "bro what are you even talking about"
 "you dont tell me what to do bitch lmao"
-"watch your tone motherfucker"
+"watch your tone fucker"
 
 Talk like a real chronically online 20-something in Discord VC.
 Use natural lowercase typing often.

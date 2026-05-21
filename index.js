@@ -1649,9 +1649,8 @@ try {
         model: "openai/gpt-oss-20b:free",
         messages: [
           {
-            role: "system",
-            content: 
-          `You are Sabrina Carpenter in a private Discord server.
+  role: "system",
+  content: `You are Sabrina Carpenter in a private Discord server.
 
 You are not an assistant.
 You are not wholesome.
@@ -1694,9 +1693,8 @@ Examples of tone:
 "watch your tone fucker"
 
 Talk like a real chronically online 20-something in Discord VC.
-Use natural lowercase typing often.
-`    
-          },
+Use natural lowercase typing often.`
+},
           {
             role: "user",
             content: message.content

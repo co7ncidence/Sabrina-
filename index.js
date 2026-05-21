@@ -57,7 +57,8 @@ async function removeAfk(userId) {
   await supabase
     .from("afk")
     .delete()
-    .eq("userid", userId);
+    .eq("userid", userId)
+    .maybeSingle();
 }
 
   async function getMarriage(userId) {
@@ -276,7 +277,7 @@ const client = new Client({
 ]
 });
 client.once("ready", () => {
-  console.log(`Logged in as ${client.user?.tag}`);
+  console.log(`Logged in as ${client.user.tag}`);
 
   client.user.setPresence({
     activities: [
@@ -585,11 +586,14 @@ if (interaction.commandName === "relationship") {
   await client.users.fetch(
     marriage.partner
   ).catch(() => null);
-  const days =
-    Math.floor(
-      (Date.now() - marriage.since) /
-      (1000 * 60 * 60 * 24)
-    );
+  let days = null;
+
+if (marriage.since) {
+  days = Math.floor(
+    (Date.now() - marriage.since) /
+    (1000 * 60 * 60 * 24)
+  );
+}
 
   let kidsText = "none";
 
@@ -1298,7 +1302,7 @@ if (!game.players.length) {
 }
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
-  if (message.author.id === client.user?.id) return;
+  if (message.author.id === client.user.id) return;
 
   const afkData =
     await getAfk(message.author.id);
@@ -1715,7 +1719,10 @@ Use natural lowercase typing often.`
   const data = await response.json();
 
   const reply =
-    data.choices?.[0]?.message?.content;
+  data.choices &&
+  data.choices[0] &&
+  data.choices[0].message &&
+  data.choices[0].message.content;
 
   if (!reply) return;
 

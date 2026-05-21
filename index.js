@@ -569,7 +569,10 @@ if (interaction.commandName === "relationship") {
   !marriage ||
   (
     !marriage.partner &&
-    (!marriage.kids || marriage.kids.length === 0)
+    (
+      !marriage.kids ||
+      marriage.kids.length === 0
+    )
   )
 ) {
   await interaction.reply(
@@ -779,7 +782,7 @@ if (sideUser.id === marriage.partner) {
     .slice(0, 2);
 
   const buttons =
-    new ActionRowBuilder<ButtonBuilder>()
+  new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
           .setCustomId("delete messages")

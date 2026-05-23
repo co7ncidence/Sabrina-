@@ -1158,7 +1158,7 @@ if (
 
   let partner = null;
 
-if (marriage.partner) {
+if (marriage && marriage.partner) {
   partner = await client.users
     .fetch(marriage.partner)
     .catch(() => null);

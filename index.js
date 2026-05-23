@@ -63,21 +63,24 @@ async function removeAfk(userId) {
 
   async function getMarriage(userId) {
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("marriages")
     .select("*")
     .eq("userid", userId)
     .maybeSingle();
 
-  if (!data) {
-  return null;
-}
+  if (error || !data) {
+    return null;
+  }
 
-return {
-  partner: data.partner ?? null,
-  since: data.since ?? null,
-  kids: data.kids || []
-};
+  return {
+    userid: data.userid,
+    partner: data.partner ?? null,
+    since: data.since ?? null,
+    kids: Array.isArray(data.kids)
+      ? data.kids
+      : []
+  };
 }
 
 async function setMarriage(userId, data) {
@@ -1091,10 +1094,10 @@ if (interaction.commandName === "runaway") {
   }
 
   const parents =
-    parentRows.filter(row =>
-      row.kids &&
-      row.kids.includes(userId)
-    );
+  parentRows.filter(row =>
+    Array.isArray(row.kids) &&
+    row.kids.includes(userId)
+  );
 
   if (parents.length === 0) {
     await interaction.reply(
@@ -1134,7 +1137,7 @@ if (interaction.commandName === "family") {
 
 const parents =
   allRows.filter(row =>
-    row.kids &&
+    Array.isArray(row.kids) &&
     row.kids.includes(interaction.user.id)
   );
 
@@ -1177,9 +1180,9 @@ if (parents.length > 0) {
 }
 
   if (
-    marriage.kids &&
-    marriage.kids.length > 0
-  ) {
+  Array.isArray(marriage?.kids) &&
+  marriage.kids.length > 0
+) {
     kidsText =
       marriage.kids
         .map(id => `<@${id}>`)

@@ -539,14 +539,15 @@ if (
 }
 
                 await setMarriage(interaction.user.id, {
-                const debugMarriage =
-  await getMarriage(interaction.user.id);
-
-console.log(debugMarriage);  
   partner: user.id,
   since: Date.now(),
   kids: []
 });
+
+const debugMarriage =
+  await getMarriage(interaction.user.id);
+
+console.log(debugMarriage);
 
             await setMarriage(user.id, {
   partner: interaction.user.id,

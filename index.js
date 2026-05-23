@@ -70,14 +70,14 @@ async function removeAfk(userId) {
     .maybeSingle();
 
   if (!data) {
-    return null;
-  }
+  return null;
+}
 
-  return {
-    partner: data.partner,
-    since: data.since,
-    kids: data.kids || []
-  };
+return {
+  partner: data.partner ?? null,
+  since: data.since ?? null,
+  kids: data.kids || []
+};
 }
 
 async function setMarriage(userId, data) {
@@ -566,16 +566,7 @@ if (interaction.commandName === "relationship") {
   const marriage =
                 await getMarriage(interaction.user.id);
 
-  if (
-  !marriage ||
-  (
-    !marriage.partner &&
-    (
-      !marriage.kids ||
-      marriage.kids.length === 0
-    )
-  )
-) {
+  if (!marriage) {
   await interaction.reply(
     "you're single"
   );
@@ -616,9 +607,9 @@ if (marriage.since) {
         name: "♡ relationship status"
       },
 
-      description: `💍 married to ${
-        partner ? `<@${partner.id}>` : "unknown user"
-      }
+      description: 💍 partner: ${
+  partner ? `<@${partner.id}>` : "none"
+}
 
 ♡ together for ${
         marriage.since ? `${days} day(s)` : "divorced"

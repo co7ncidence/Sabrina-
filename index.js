@@ -593,16 +593,16 @@ if (marriage.since) {
 
   let kidsText = "none";
 
-  if (
+if (
   marriage &&
   marriage.kids &&
   marriage.kids.length > 0
 ) {
-    kidsText =
-      marriage.kids
-        .map(id => `<@${id}>`)
-        .join(", ");
-  }
+  kidsText =
+    marriage.kids
+      .map(id => `<@${id}>`)
+      .join("\n");
+}
 
   await interaction.reply({
   embeds: [

@@ -1126,15 +1126,29 @@ if (interaction.commandName === "family") {
   const marriage =
     await getMarriage(interaction.user.id);
 
-  if (
-  !marriage ||
+  const { data: allRows } =
+  await supabase
+    .from("marriages")
+    .select("*");
+
+const parents =
+  allRows.filter(row =>
+    row.kids &&
+    row.kids.includes(interaction.user.id)
+  );
+
+if (
   (
-    !marriage.partner &&
+    !marriage ||
     (
-      !marriage.kids ||
-      marriage.kids.length === 0
+      !marriage.partner &&
+      (
+        !marriage.kids ||
+        marriage.kids.length === 0
+      )
     )
-  )
+  ) &&
+  parents.length === 0
 ) {
   await interaction.reply(
     "you dont have a family"
@@ -1151,6 +1165,15 @@ if (marriage.partner) {
 }
 
   let kidsText = "none";
+  let parentsText = "none";
+
+if (parents.length > 0) {
+
+  parentsText =
+    parents
+      .map(parent => `<@${parent.userid}>`)
+      .join("\n");
+}
 
   if (
     marriage.kids &&
@@ -1172,7 +1195,10 @@ if (marriage.partner) {
         },
 
         description:
-`💍 partner: ${partner ? `<@${partner.id}>` : "unknown user"}
+`💍 partner: ${partner ? `<@${partner.id}>` : "none"}
+
+🧑 parents:
+${parentsText}
 
 👶 children:
 ${kidsText}`

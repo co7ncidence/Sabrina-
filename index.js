@@ -607,7 +607,7 @@ if (marriage.since) {
         name: "♡ relationship status"
       },
 
-      description: 💍 partner: ${
+      description: `💍 partner: ${
   partner ? `<@${partner.id}>` : "none"
 }
 

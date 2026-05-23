@@ -594,9 +594,10 @@ if (marriage.since) {
   let kidsText = "none";
 
   if (
-    marriage.kids &&
-    marriage.kids.length > 0
-  ) {
+  marriage &&
+  marriage.kids &&
+  marriage.kids.length > 0
+) {
     kidsText =
       marriage.kids
         .map(id => `<@${id}>`)
